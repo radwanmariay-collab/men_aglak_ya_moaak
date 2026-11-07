@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تمكين | مجتمع وخدمات ذوي الإعاقة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#0a0a0a;--brand:#2c5f2d;--deep:#0a1f11;--light:#97bc62;--surface:#f4f6f4;--card:#fff;--soft:#5a6070;--ghost:#d5dcd5;--line:#e0e4e0;--on:#fff;--rc:1.5rem;--rl:2rem;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1410;--fg:#eef2ee;--brand:#7fb97f;--surface:#151d17;--card:#1b251d;--soft:#a9b4ab;--ghost:#2a372c;--line:#2d3a2f;--on:#0a1f11}}
+body.hc{--bg:#000;--fg:#fff;--brand:#ffeb00;--deep:#000;--light:#ffeb00;--surface:#111;--card:#000;--soft:#e6e6e6;--ghost:#444;--line:#fff;--on:#000}
+body.readable,body.readable *{font-family:Arial,Tahoma,sans-serif!important}
+body.calm *{animation:none!important;transition:none!important}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-padding-top:5rem}
+body{background:var(--bg);color:var(--fg);font-family:"Tajawal",Tahoma,sans-serif;line-height:1.8;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--light);outline-offset:3px}body.hc :focus-visible{outline-color:#00e5ff}
+.skip{position:absolute;top:-4rem;right:1rem;background:var(--brand);color:var(--on);padding:.6rem 1rem;border-radius:.5rem;z-index:300}.skip:focus{top:.5rem}
+#loader{position:fixed;inset:0;z-index:200;background:var(--deep);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:transform .85s cubic-bezier(.65,0,.35,1)}
+#loader.out{transform:translateY(-105%)}
+.lb{font-size:1.8rem;font-weight:800;display:flex;gap:.6rem;align-items:center;animation:up .7s both}
+.lt{width:10rem;height:2px;background:rgba(255,255,255,.2);border-radius:9rem;overflow:hidden}
+.lt i{display:block;height:100%;background:#fff;transform:scaleX(0);transform-origin:right;animation:fill 1.3s .12s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes fill{to{transform:scaleX(1)}}@keyframes up{from{opacity:0;transform:translateY(16px)}}
+main{padding:.5rem}@media(min-width:640px){main{padding:.75rem}}
+header.top{position:sticky;top:0;z-index:50;background:var(--deep);color:#fff;border-radius:0 0 1.25rem 1.25rem}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.7rem 1.25rem;max-width:80rem;margin:0 auto}
+.brand{font-weight:800;font-size:1.3rem;display:flex;gap:.5rem;align-items:center}
+.brand svg{width:1.4rem;height:1.4rem}
+nav.d ul{list-style:none;display:none;gap:.25rem}@media(min-width:1024px){nav.d ul{display:flex}}
+nav.d a{display:block;padding:.45rem .9rem;border-radius:9rem;font-weight:700;font-size:.95rem}
+nav.d a:hover{background:rgba(255,255,255,.14)}nav.d a[aria-current="page"]{background:var(--light);color:#0a1f11}
+body.hc nav.d a[aria-current="page"]{background:#ffeb00;color:#000}
+.rt{display:flex;gap:.75rem;align-items:center}
+.burger{width:2.6rem;height:2.6rem;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-content:center;gap:5px;border:0}
+.burger i{display:block;width:1rem;height:2px;background:#fff}@media(min-width:1024px){.burger{display:none}}
+.btn{display:inline-flex;align-items:center;gap:.5rem;border:2px solid transparent;border-radius:9rem;padding:.8rem 1.6rem;font-weight:700;background:var(--fg);color:var(--bg);transition:transform .3s,background .3s}
+.btn:hover{transform:translateY(-3px)}.btn.lt2{background:#fff;color:#0a1f11}.btn.lt2:hover{background:var(--light)}
+.btn.alt{background:transparent;color:inherit;border-color:currentColor}.btn.br{background:var(--brand);color:var(--on)}
+#menu{position:fixed;inset:0;z-index:90;background:var(--deep);color:#fff;display:none;flex-direction:column;padding:1.5rem}
+#menu.open{display:flex}#menu ul{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:center}
+#menu li a{display:block;font-size:clamp(2.2rem,9vw,3.5rem);font-weight:800;padding:.2rem 0}#menu li a:hover{color:var(--light)}
+.page{display:none}.page.on{display:block}
+.hero{position:relative;overflow:hidden;background:var(--deep);color:#fff;border-radius:var(--rl);min-height:calc(100svh - 5rem);display:flex;flex-direction:column;justify-content:flex-end;margin-top:.5rem;background-image:radial-gradient(circle at 80% 20%,rgba(151,188,98,.3),transparent 45%),radial-gradient(circle at 10% 90%,rgba(44,95,45,.7),transparent 55%),linear-gradient(to bottom,rgba(10,31,17,.6),var(--deep))}
+body.hc .hero{border:2px solid #fff}
+.hero.sm{min-height:0;padding:3rem 0 2.5rem}
+.hin{padding:2rem 1.5rem 2rem;max-width:80rem;width:100%;margin:0 auto}@media(min-width:640px){.hin{padding:2rem 2.5rem 2.5rem}}
+.ey{display:inline-flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:700;color:var(--soft)}.ey:before{content:"";width:.4rem;height:.4rem;border-radius:50%;background:var(--brand)}
+.hero .ey,.dk .ey{color:rgba(255,255,255,.75)}.hero .ey:before,.dk .ey:before{background:var(--light)}
+.title{font-size:clamp(2.8rem,11vw,9rem);font-weight:800;line-height:1.15;margin:.75rem 0 1.5rem}
+.h2{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.2;margin-top:.75rem}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em}
+.w .i{display:inline-block;transform:translateY(115%);opacity:0;transition:transform 1s cubic-bezier(.16,1,.3,1),opacity 1s}
+.go .w .i{transform:none;opacity:1}
+.rise{opacity:0;transform:translateY(32px);transition:opacity .8s var(--d,0s),transform .8s cubic-bezier(.16,1,.3,1) var(--d,0s)}.rise.in{opacity:1;transform:none}
+.bot{display:flex;flex-direction:column;gap:1.5rem}@media(min-width:640px){.bot{flex-direction:row;justify-content:space-between;align-items:flex-end}}
+.tag{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;line-height:1.3;opacity:.9}
+.cl{display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap}
+.glass{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border-radius:var(--rc);padding:.9rem;display:flex;gap:.8rem;align-items:center;transition:transform .3s}.glass:hover{transform:translateY(-4px)}
+.sl{width:16rem;display:none}@media(min-width:768px){.sl{display:block}}
+.sl .glass{opacity:1;transition:opacity .35s,transform .35s}.sl .glass.fade{opacity:0;transform:translateY(12px) scale(.96)}
+.thumb{width:3.2rem;height:3.2rem;border-radius:.75rem;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:1.6rem;flex:none}
+.dots{display:flex;gap:.4rem;margin-top:.75rem}.dots button{padding:.35rem;background:none;border:0}.dots i{display:block;height:.4rem;width:.4rem;border-radius:9rem;background:var(--ghost);transition:width .3s}
+.dots button[aria-current="true"] i{width:1.3rem;background:var(--fg)}.hero .dots i{background:rgba(255,255,255,.4)}.hero .dots button[aria-current="true"] i{background:#fff}
+.mem{width:15rem}.mem b{font-size:1.9rem;line-height:1}.av{display:flex;margin-top:.4rem}.av i{width:1.2rem;height:1.2rem;border-radius:50%;border:1px solid var(--deep);margin-inline-start:-.4rem}
+.mem small{display:block;opacity:.85;font-size:.75rem}
+.blk{padding:5rem 1.5rem}@media(min-width:640px){.blk{padding:6rem 2.5rem}}.in2{max-width:76rem;margin:0 auto}
+.s{background:var(--surface);border-radius:var(--rl);margin-top:.75rem}.dk{background:var(--deep);color:#fff;border-radius:var(--rl);margin-top:.75rem}
+body.hc .dk,body.hc .s{border:2px solid #fff}
+.trust{position:relative;overflow:hidden;text-align:center}
+.ghostw{pointer-events:none;user-select:none;margin:2rem auto 0;max-width:80rem;font-size:clamp(2.4rem,8.2vw,8rem);font-weight:800;line-height:1.1;color:var(--ghost)}
+.ghostw .r{display:flex;justify-content:space-between;gap:1rem}.ghostw .k{color:var(--fg)}
+.badge{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;text-align:right}
+.pct{width:7.5rem;height:7.5rem;border-radius:50%;background:var(--surface);display:grid;place-content:center;text-align:center;font-size:.65rem;color:var(--soft);line-height:1.3}.pct b{font-size:1.5rem;color:var(--fg)}
+.bc{max-width:28rem;display:flex;gap:1rem;background:var(--surface);border-radius:var(--rc);padding:1.25rem}.bc strong{font-size:1.2rem;background:var(--bg);border-radius:.75rem;padding:.3rem .9rem;align-self:flex-start}.bc p{font-size:.85rem;color:var(--soft)}
+.cc{width:14rem;aspect-ratio:3/4;margin:2rem auto;transform:rotate(6deg);border-radius:var(--rc);background:linear-gradient(160deg,var(--brand),var(--deep));display:grid;place-items:center;font-size:5rem;position:relative;overflow:hidden;color:#fff;transition:transform .4s}
+.cc:hover{transform:rotate(0)}.cc figcaption{position:absolute;inset:auto .75rem .75rem;background:rgba(10,31,17,.55);backdrop-filter:blur(8px);border-radius:.75rem;padding:.5rem .8rem;font-size:.85rem;font-weight:700;line-height:1.4}
+.cc.sw{opacity:.2}.cc{transition:opacity .3s,transform .4s}
+.ctl{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem}
+.ar{width:3.4rem;height:3.4rem;border-radius:50%;border:1px solid var(--line);background:transparent;font-size:1.3rem;transition:transform .3s}.ar:hover{transform:scale(1.12)}.ar.f{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.plist{list-style:none;margin-top:3rem}.plist a{display:flex;align-items:center;gap:1.5rem;padding:1.6rem 0;border-top:1px solid var(--line)}.plist li:last-child a{border-bottom:1px solid var(--line)}
+.plist .n{width:2.5rem;color:var(--soft);font-weight:700}.plist h3{font-size:clamp(1.4rem,3vw,1.9rem);line-height:1.3}.plist p{color:var(--soft);font-size:.95rem}.plist .t{flex:1}
+.plist .o{width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;opacity:.55;transition:transform .3s,opacity .3s}.plist a:hover .o{transform:translateX(-8px);opacity:1}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:3rem 2rem;margin-top:3.5rem}@media(min-width:1024px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stats div{border-top:1px solid rgba(255,255,255,.25);padding-top:1.2rem}.stats b{display:block;font-size:clamp(3rem,6vw,4.5rem);line-height:1.1}.stats span{opacity:.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:1.25rem;margin-top:3rem}
+.card{background:var(--surface);border-radius:var(--rc);padding:1.75rem;transition:transform .3s;display:flex;flex-direction:column;justify-content:space-between}.card:hover{transform:translateY(-8px)}
+.bg2 .card{background:var(--card);border:1px solid var(--line)}
+.card h3{font-size:1.2rem}.card p,.card li{color:var(--soft)}.card ul{padding-right:1.2rem;margin-top:.5rem}.ico{font-size:2rem;display:block}
+.q{font-size:2.5rem;color:var(--brand);line-height:1}.card blockquote{margin-top:.75rem}.card figcaption{border-top:1px solid var(--line);margin-top:1.25rem;padding-top:.9rem}.card figcaption span{display:block;color:var(--soft);font-size:.9rem}
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:2rem}.tab{border:2px solid var(--brand);background:transparent;border-radius:9rem;padding:.45rem 1.1rem;font-weight:700}.tab[aria-pressed="true"]{background:var(--brand);color:var(--on)}
+form{max-width:34rem;margin-top:2rem}label{display:block;font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+.fi{width:100%;padding:.8rem 1rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);margin-bottom:1.1rem}.fi:focus{border-color:var(--brand)}
+.ok{background:var(--surface);border:2px solid var(--brand);border-radius:var(--rc);padding:1.25rem;margin-top:1.25rem;max-width:34rem}
+.tgl{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--line)}.row{display:flex;gap:.6rem;flex-wrap:wrap}
+footer{background:var(--deep);color:#fff;border-radius:var(--rl);margin-top:.75rem;padding:3.5rem 1.5rem}@media(min-width:640px){footer{padding:4rem 2.5rem}}
+.cta{display:flex;flex-direction:column;gap:1.5rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.15)}@media(min-width:640px){.cta{flex-direction:row;justify-content:space-between;align-items:flex-end}}
+.cta p{font-size:clamp(2.6rem,7vw,4.5rem);font-weight:800;line-height:1.15}
+.fc{display:grid;gap:2.5rem;padding:3.5rem 0}@media(min-width:768px){.fc{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+.fc h4{font-size:.85rem;opacity:.55;margin-bottom:.8rem}.fc ul{list-style:none}.fc li{margin-bottom:.5rem;opacity:.85;font-size:.95rem}.fc a:hover{color:var(--light)}
+.copy{border-top:1px solid rgba(255,255,255,.15);padding-top:1.5rem;font-size:.9rem;opacity:.65}
+.fab{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom,0px));left:1rem;z-index:80}
+.fab>button{width:3.6rem;height:3.6rem;border-radius:50%;background:var(--brand);color:var(--on);font-size:1.7rem;border:2px solid var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.panel{position:absolute;bottom:4.4rem;left:0;width:17rem;background:var(--card);border:2px solid var(--brand);border-radius:var(--rc);padding:.75rem;display:none;flex-direction:column;gap:.4rem}.panel.open{display:flex}
+.panel button{text-align:right;padding:.6rem .8rem;border-radius:.6rem;background:var(--surface);border:1px solid var(--line);font-weight:700}.panel button[aria-pressed="true"]{background:var(--brand);color:var(--on)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+<div id="loader" aria-hidden="true"><div class="lb"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M4.8 5.6A9 9 0 0 0 4.8 18.4"/><path d="M19.2 5.6a9 9 0 0 1 0 12.8"/></svg>تمكين</div><div class="lt"><i></i></div></div>
+
+<header class="top"><div class="bar">
+  <a class="brand" href="#home" aria-label="تمكين - الرئيسية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M4.8 5.6A9 9 0 0 0 4.8 18.4"/><path d="M19.2 5.6a9 9 0 0 1 0 12.8"/></svg>تمكين</a>
+  <nav class="d" aria-label="التنقل الرئيسي"><ul id="nav"></ul></nav>
+  <div class="rt"><a class="btn lt2" href="#request">طلب خدمة</a><button class="burger" id="bg" aria-label="القائمة" aria-expanded="false" aria-controls="menu"><i></i><i></i></button></div>
+</div></header>
+<div id="menu" role="dialog" aria-label="القائمة"><div style="text-align:left"><button class="btn alt" id="mc" style="color:#fff">إغلاق ✕</button></div><ul id="mlist"></ul></div>
+
+<main id="main" tabindex="-1">
+<div class="page" id="p-home">
+ <section class="hero"><div class="hin">
+  <span class="ey rise in">الدعم الكامل قبل وصولك</span>
+  <h1 class="title" id="ht" data-split="نجهّز لك المكان،|لترتاح في كل خطوة." tabindex="-1"></h1>
+  <div class="bot">
+   <p class="tag rise" id="tg" style="--d:.35s">مجتمع وخدمات<br>تصل إليك أولاً</p>
+   <div class="cl">
+    <div class="sl rise" style="--d:.65s"><div class="glass" id="sc"></div><div class="dots" id="sd"></div></div>
+    <div class="glass mem rise" style="--d:.78s"><div><b>٤</b><small>قطاعات خدمات</small><div class="av"><i style="background:#97bc62"></i><i style="background:#2c5f2d"></i><i style="background:#c2e029"></i><i style="background:#fff"></i></div></div></div>
+   </div>
+  </div>
+ </div></section>
+
+ <section class="blk trust"><div class="in2">
+  <div class="badge"><div class="pct rise"><div><b>3</b><br>خطوات فقط لتجهيز استقبالك</div></div>
+  <div class="bc rise" style="--d:.12s"><strong>#01</strong><div><h3 style="font-size:1.1rem">مجتمع يدعمك</h3><p>من الإعاقة الحركية إلى الحالات الصحية الحرجة، تجد هنا من يشاركك التجربة والنصيحة.</p></div></div></div>
+  <h2 class="ghostw" id="gw" aria-live="polite"></h2>
+  <figure class="cc rise" id="cc"></figure>
+  <div class="ctl"><button class="ar" id="gp" aria-label="السابق">→</button><div class="dots" id="gd" style="margin:0"></div><button class="ar f" id="gn" aria-label="التالي">←</button></div>
+ </div></section>
+
+ <section class="blk s"><div class="in2"><span class="ey">قطاعات الخدمات</span><h2 class="h2" data-split="مبنية لكل|احتياج"></h2><ul class="plist" id="plist"></ul></div></section>
+
+ <section class="blk dk"><div class="in2"><span class="ey">المنصة بالأرقام</span><h2 class="h2" data-split="كل ما تحتاجه|في مكان واحد"></h2>
+  <div class="stats"><div class="rise"><b>4</b><span>قطاعات خدمات</span></div><div class="rise" style="--d:.11s"><b>5</b><span>مجموعات مجتمعية</span></div><div class="rise" style="--d:.22s"><b>6</b><span>أدوات سهولة الوصول</span></div><div class="rise" style="--d:.33s"><b>3</b><span>خطوات للطلب</span></div></div>
+ </div></section>
+
+ <section class="blk bg2"><div class="in2"><span class="ey">ماذا يقول الأعضاء</span><h2 class="h2" data-split="تجارب|من المجتمع"></h2><p style="color:var(--soft);margin-top:.5rem">أمثلة توضيحية لشكل التجارب التي ستظهر هنا.</p>
+  <div class="grid">
+   <figure class="card rise"><div><span class="q">“</span><blockquote>اتصلت بالمستشفى قبل الزيارة وجهّزوا لي الممر والمرافق. كان الاستقبال مريحاً جداً.</blockquote></div><figcaption><strong>أم محمد</strong><span>الإعاقة الحركية</span></figcaption></figure>
+   <figure class="card rise" style="--d:.12s"><div><span class="q">“</span><blockquote>أخيراً أنهيت أوراقي في السجل المدني بدون طوابير، ومعي موظف مخصص.</blockquote></div><figcaption><strong>أحمد</strong><span>الخدمات الحكومية</span></figcaption></figure>
+   <figure class="card rise" style="--d:.24s"><div><span class="q">“</span><blockquote>العقود بطريقة برايل غيّرت تجربتي مع البنك تماماً.</blockquote></div><figcaption><strong>سلمى</strong><span>المكفوفون</span></figcaption></figure>
+  </div></div></section>
+</div>
+
+<div class="page" id="p-services">
+ <section class="hero sm"><div class="hin"><span class="ey">الخدمات</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="الخدمات التي|نوفرها" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2"><p style="color:var(--soft)">صفّ حسب القطاع لتجد التجهيزات المتاحة لك.</p><div class="tabs" id="tabs" role="group" aria-label="تصفية القطاعات"></div><div class="grid" id="svg" aria-live="polite"></div></div></section>
+</div>
+
+<div class="page" id="p-community">
+ <section class="hero sm"><div class="hin"><span class="ey">المجتمع</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="مجتمع|تمكين" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2"><h2 class="h2">المجموعات</h2><div class="grid" id="groups"></div></div></section>
+ <section class="blk s"><div class="in2"><h2 class="h2">شارك تجربتك</h2><p style="color:var(--soft)">المنشورات تُعرض في هذه الجلسة فقط.</p>
+  <form id="tf"><label for="tn">اسمك (اختياري)</label><input class="fi" id="tn" maxlength="40"><label for="tt">تجربتك أو نصيحتك</label><textarea class="fi" id="tt" rows="3" required maxlength="400"></textarea><button class="btn" type="submit">انشر</button></form>
+  <div class="grid" id="tips" aria-live="polite"></div></div></section>
+</div>
+
+<div class="page" id="p-access">
+ <section class="hero sm"><div class="hin"><span class="ey">سهولة الوصول</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="خصّص الموقع|كما تحب" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2" style="max-width:46rem">
+  <div class="tgl"><div><strong>حجم الخط</strong><div style="color:var(--soft)">الحالي: <span id="sv">100</span>%</div></div><div class="row"><button class="btn alt" data-a="smaller" aria-label="تصغير الخط">أ−</button><button class="btn alt" data-a="bigger" aria-label="تكبير الخط">أ+</button></div></div>
+  <div class="tgl"><strong>تباين عالٍ</strong><button class="btn alt" data-t="hc" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>خط سهل القراءة</strong><button class="btn alt" data-t="readable" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>تقليل الحركة</strong><button class="btn alt" data-t="calm" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><div><strong>قراءة الصفحة بصوت عالٍ</strong><div style="color:var(--soft)">بالعربية حسب أصوات جهازك</div></div><div class="row"><button class="btn br" data-a="read">🔊 اقرأ</button><button class="btn alt" data-a="stop">إيقاف</button></div></div>
+  <p style="margin-top:1.5rem"><button class="btn alt" data-a="reset">إعادة الضبط</button></p>
+ </div></section>
+</div>
+
+<div class="page" id="p-request">
+ <section class="hero sm"><div class="hin"><span class="ey">طلب خدمة</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="تعالَ نجهّز|لك المكان" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2">
+  <form id="rf" style="margin-top:0"><label for="rn">الاسم</label><input class="fi" id="rn" required autocomplete="name">
+  <label for="rp">رقم الهاتف</label><input class="fi" id="rp" type="tel" required autocomplete="tel" inputmode="tel">
+  <label for="rc">القطاع</label><select class="fi" id="rc"></select>
+  <label for="re">الجهة المطلوبة</label><input class="fi" id="re" required placeholder="مثال: مستشفى الأمل، السجل المدني">
+  <label for="rd">التجهيز المطلوب</label><textarea class="fi" id="rd" rows="3" required placeholder="مثال: ممر كرسي متحرك، مترجم إشارة"></textarea>
+  <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="ru"> حالة عاجلة</label><br><button class="btn" type="submit">إرسال الطلب</button></form>
+  <div id="done" class="ok" role="status" hidden></div>
+ </div></section>
+</div>
+</main>
+
+<footer><div class="in2">
+ <div class="cta"><div><span class="ey" style="color:rgba(255,255,255,.7)">ابدأ الآن</span><p>جاهز؟<br>ابدأ طلبك.</p></div><a class="btn lt2" href="#request">اطلب خدمة ميسّرة ←</a></div>
+ <div class="fc"><div><strong style="font-size:1.2rem">تمكين</strong><p style="opacity:.65;margin-top:.8rem;max-width:20rem;font-size:.95rem">منصة مجتمعية لتيسير الخدمات لذوي الإعاقة والحالات الصحية الحرجة. نسخة تجريبية.</p></div>
+ <nav aria-label="الخدمات"><h4>الخدمات</h4><ul><li><a href="#services">المستشفيات</a></li><li><a href="#services">الجهات الحكومية</a></li><li><a href="#services">البنوك</a></li><li><a href="#services">التأهيل</a></li></ul></nav>
+ <nav aria-label="المجتمع"><h4>المجتمع</h4><ul><li><a href="#community">المجموعات</a></li><li><a href="#community">شارك تجربتك</a></li></ul></nav>
+ <nav aria-label="المنصة"><h4>المنصة</h4><ul><li><a href="#access">سهولة الوصول</a></li><li><a href="#request">طلب خدمة</a></li></ul></nav></div>
+ <div class="copy">© 2026 تمكين. جميع الحقوق محفوظة.</div>
+</div></footer>
+
+<div class="fab"><div class="panel" id="panel" role="group" aria-label="سهولة الوصول">
+ <button data-a="bigger">تكبير الخط أ+</button><button data-a="smaller">تصغير الخط أ−</button><button data-t="hc" aria-pressed="false">تباين عالٍ</button><button data-a="read">🔊 قراءة الصفحة</button><button data-a="stop">إيقاف القراءة</button></div>
+ <button id="fb" aria-label="أدوات سهولة الوصول" aria-expanded="false" aria-controls="panel">♿</button></div>
+
+<script>
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var SV=[{k:"h",i:"🏥",t:"المستشفيات والرعاية",d:"استقبال مهيأ للحالات الحركية والحرجة.",l:["ممرات وغرف كشف مجهزة للكراسي المتحركة","مرافق طبي حسب حالتك","مواعيد ذات أولوية","مترجم لغة إشارة"]},
+{k:"g",i:"🏛️",t:"الجهات الحكومية",d:"السجل المدني والجوازات بدون انتظار طويل.",l:["شباك مخصص بدون طوابير","موظف مختص لإنهاء الأوراق","نماذج وإرشادات ميسّرة","زيارة منزلية حيث تتوفر"]},
+{k:"b",i:"🏦",t:"البنوك والمصارف",d:"خدمات مصرفية مستقلة وآمنة.",l:["خدمة عملاء بلغة الإشارة","عقود بطريقة برايل","ماكينات صراف ناطقة","دخول ميسّر للفروع"]},
+{k:"r",i:"🩺",t:"التأهيل والخدمات الصحية",d:"رعاية مستمرة ما بعد العلاج.",l:["علاج طبيعي وتأهيل","أجهزة تعويضية وكراسي متحركة","دعم نفسي للمرضى وأسرهم","توصيل الأدوية"]}];
+var GR=[{i:"🦽",t:"الإعاقة الحركية",d:"نصائح التنقل والأجهزة المساعدة والأماكن الميسّرة."},{i:"🤟",t:"الصم وضعاف السمع",d:"لغة الإشارة والتواصل مع الجهات وتجارب الخدمة."},{i:"🦯",t:"المكفوفون وضعاف البصر",d:"برايل وقارئات الشاشة والوصول المستقل."},{i:"❤️‍🩹",t:"الحالات الصحية الحرجة",d:"دعم المرضى ومرافقيهم وتنسيق الرعاية."},{i:"👨‍👩‍👧",t:"الأسر والمرافقون",d:"مساحة لتبادل الخبرة والدعم النفسي."}];
+var PG=[["home","الرئيسية"],["services","الخدمات"],["community","المجتمع"],["access","سهولة الوصول"],["request","طلب خدمة"]];
+$("#nav").innerHTML=PG.map(function(p){return '<li><a href="#'+p[0]+'">'+p[1]+'</a></li>'}).join('');
+$("#mlist").innerHTML=PG.map(function(p){return '<li><a href="#'+p[0]+'">'+p[1]+'</a></li>'}).join('');
+/* split reveal */
+$$("[data-split]").forEach(function(el){var n=0;el.setAttribute("aria-label",el.dataset.split.replace("|"," "));
+ el.innerHTML=el.dataset.split.split("|").map(function(l){return l.split(" ").map(function(w){return '<span class="w" aria-hidden="true"><span class="i" style="transition-delay:'+(n++*140)+'ms">'+w+'</span></span>'}).join(" ")}).join("<br>")});
+/* inview */
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");if(e.target.dataset.split!==undefined&&e.target.id!=="ht")e.target.classList.add("go");io.unobserve(e.target)}})},{threshold:.15});
+$$(".rise,[data-split]").forEach(function(e){if(e.id!=="ht")io.observe(e)});
+/* services */
+$("#plist").innerHTML=SV.map(function(s,i){return '<li class="rise" style="--d:'+(i*.09)+'s"><a href="#services"><span class="n">0'+(i+1)+'</span><div class="t"><h3>'+s.t+'</h3><p>'+s.d+'</p></div><span class="o" aria-hidden="true">←</span></a></li>'}).join('');
+function card(s){return '<article class="card" style="display:block"><span class="ico" aria-hidden="true">'+s.i+'</span><h3>'+s.t+'</h3><p>'+s.d+'</p><ul>'+s.l.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></article>'}
+function showSvc(k){$("#svg").innerHTML=SV.filter(function(s){return k==="all"||s.k===k}).map(card).join('');$$(".tab").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.k===k)})}
+$("#tabs").innerHTML='<button class="tab" data-k="all">الكل</button>'+SV.map(function(s){return '<button class="tab" data-k="'+s.k+'">'+s.t+'</button>'}).join('');
+$("#tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(b)showSvc(b.dataset.k)});showSvc("all");
+$("#rc").innerHTML=SV.map(function(s){return '<option>'+s.t+'</option>'}).join('');
+$("#groups").innerHTML=GR.map(function(g,i){return '<article class="card rise" style="display:block;--d:'+(i*.08)+'s"><span class="ico" aria-hidden="true">'+g.i+'</span><h3>'+g.t+'</h3><p>'+g.d+'</p></article>'}).join('');
+$("#tips").innerHTML='<div class="card" style="display:block"><h3>أم محمد</h3><p>اتصلت بالمستشفى قبل الزيارة وطلبت ممراً للكرسي المتحرك، وكان الاستقبال ممتازاً.</p></div>';
+$("#tf").addEventListener("submit",function(e){e.preventDefault();var t=$("#tt").value.trim();if(!t)return;$("#tips").insertAdjacentHTML("afterbegin",'<div class="card" style="display:block"><h3>'+esc($("#tn").value.trim()||"عضو من المجتمع")+'</h3><p>'+esc(t)+'</p></div>');this.reset()});
+$("#rf").addEventListener("submit",function(e){e.preventDefault();var d=$("#done");d.hidden=false;d.setAttribute("tabindex","-1");d.innerHTML='<strong>تم تسجيل طلبك يا '+esc($("#rn").value)+'.</strong><br>الجهة: '+esc($("#re").value)+' — '+($("#ru").checked?"حالة عاجلة":"طلب عادي")+'<br><small>نسخة تجريبية: الطلب لا يُرسل لأي جهة فعلية بعد.</small>';d.focus();this.reset()});
+/* hero slider */
+var si=0;function dots(el,n,cur,fn){el.innerHTML=Array.apply(null,Array(n)).map(function(_,i){return '<button aria-label="شريحة '+(i+1)+'" aria-current="'+(i===cur)+'"><i></i></button>'}).join('');$$("button",el).forEach(function(b,i){b.onclick=function(){fn(i)}})}
+function slide(i,fast){si=i;var c=$("#sc"),s=SV[i];function f(){c.innerHTML='<div class="thumb" aria-hidden="true">'+s.i+'</div><div><div style="font-weight:700;font-size:.85rem">'+s.t+'</div><a href="#services" style="font-size:.75rem;text-decoration:underline">استعرض ←</a></div>';c.classList.remove("fade");dots($("#sd"),SV.length,i,slide)}
+ if(fast){f()}else{c.classList.add("fade");setTimeout(f,300)}}
+slide(0,true);var sT=setInterval(function(){if(!document.hidden&&$("#p-home").classList.contains("on"))slide((si+1)%SV.length)},3800);
+/* trust carousel */
+var TS=[{w:["مجتمع","يفهمك","ويدعمك","دائماً"],i:"🦽",n:"مجتمع الحركة",r:"مجموعة دعم"},{w:["صوتك","مسموع","وحقك","محفوظ"],i:"🤟",n:"الصم وضعاف السمع",r:"مجموعة دعم"},{w:["وصول","مستقل","لكل","شخص"],i:"🦯",n:"المكفوفون",r:"مجموعة دعم"}],ti=0;
+function trust(i){ti=i;var t=TS[i],w=t.w.map(function(x,j){return '<span class="w'+'"><span class="i" style="transition-delay:'+(j*120)+'ms">'+x+'</span></span>'});
+ var g=$("#gw");g.classList.remove("go");g.setAttribute("aria-label",t.w.join(" "));
+ g.innerHTML='<span class="r"><span class="'+'">'+w[0]+'</span><span>'+w[1]+'</span></span><span class="r"><span class="k">'+w[2]+'</span><span>'+w[3]+'</span></span>';
+ $$(".w",g).forEach(function(x){x.setAttribute("aria-hidden","true")});requestAnimationFrame(function(){requestAnimationFrame(function(){g.classList.add("go")})});
+ var c=$("#cc");c.classList.add("sw");setTimeout(function(){c.innerHTML='<span aria-hidden="true">'+t.i+'</span><figcaption>'+t.n+'<br><small style="opacity:.8">'+t.r+'</small></figcaption>';c.classList.remove("sw")},250);
+ dots($("#gd"),TS.length,i,trust)}
+trust(0);$("#gn").onclick=function(){trust((ti+1)%TS.length)};$("#gp").onclick=function(){trust((ti+TS.length-1)%TS.length)};
+/* menu */
+function menu(o){$("#menu").classList.toggle("open",o);$("#bg").setAttribute("aria-expanded",o);document.body.style.overflow=o?"hidden":""}
+$("#bg").onclick=function(){menu(true);$("#mc").focus()};$("#mc").onclick=function(){menu(false)};$("#mlist").onclick=function(){menu(false)};
+/* a11y */
+var S={size:100,hc:false,readable:false,calm:false};
+try{var sv=JSON.parse(localStorage.getItem("tamkeen_a11y")||"null");if(sv)S=Object.assign(S,sv)}catch(e){}
+function apply(){document.documentElement.style.fontSize=(16*S.size/100)+"px";["hc","readable","calm"].forEach(function(k){document.body.classList.toggle(k,!!S[k]);$$('[data-t="'+k+'"]').forEach(function(b){b.setAttribute("aria-pressed",S[k]);if(b.classList.contains("alt"))b.textContent=S[k]?"مفعّل":"إيقاف"})});$("#sv").textContent=S.size;try{localStorage.setItem("tamkeen_a11y",JSON.stringify(S))}catch(e){}}
+function stopR(){if("speechSynthesis" in window)speechSynthesis.cancel()}
+function read(){if(!("speechSynthesis" in window)){alert("متصفحك لا يدعم القراءة الصوتية");return}stopR();var u=new SpeechSynthesisUtterance($(".page.on").innerText);u.lang="ar-EG";speechSynthesis.speak(u)}
+document.addEventListener("click",function(e){var b=e.target.closest("[data-a],[data-t]");if(!b)return;if(b.dataset.t)S[b.dataset.t]=!S[b.dataset.t];else{var a=b.dataset.a;if(a==="bigger")S.size=Math.min(160,S.size+10);if(a==="smaller")S.size=Math.max(80,S.size-10);if(a==="reset")S={size:100,hc:false,readable:false,calm:false};if(a==="read")read();if(a==="stop")stopR()}apply()});
+$("#fb").onclick=function(){var o=$("#panel").classList.toggle("open");this.setAttribute("aria-expanded",o)};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){menu(false);$("#panel").classList.remove("open");$("#fb").setAttribute("aria-expanded","false")}});
+apply();
+/* routing */
+function route(){var h=(location.hash||"#home").slice(1);if(!PG.some(function(p){return p[0]===h}))h="home";
+ $$(".page").forEach(function(p){p.classList.toggle("on",p.id==="p-"+h)});
+ $$("#nav a").forEach(function(a){a.getAttribute("href")==="#"+h?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
+ var pg=$("#p-"+h),hd=$("h1",pg);window.scrollTo(0,0);stopR();if(hd&&hd.id!=="ht"){hd.classList.add("go");hd.focus({preventScroll:true})}
+ document.title=(hd?hd.getAttribute("aria-label"):"تمكين")+" | تمكين"}
+window.addEventListener("hashchange",route);route();
+/* loader */
+var done=false;function reveal(){if(done)return;done=true;var l=$("#loader");l.classList.add("out");$("#ht").classList.add("go");$("#ht").setAttribute("tabindex","-1");setTimeout(function(){l.remove()},S.calm?0:900)}
+setTimeout(reveal,S.calm?100:1400);
+</script>
+</body>
+</html>
