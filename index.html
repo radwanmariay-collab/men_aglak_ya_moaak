@@ -105,6 +105,13 @@ footer{background:var(--deep);color:#fff;border-radius:var(--rl);margin-top:.75r
 .panel{position:absolute;bottom:4.4rem;left:0;width:17rem;background:var(--card);border:2px solid var(--brand);border-radius:var(--rc);padding:.75rem;display:none;flex-direction:column;gap:.4rem}.panel.open{display:flex}
 .panel button{text-align:right;padding:.6rem .8rem;border-radius:.6rem;background:var(--surface);border:1px solid var(--line);font-weight:700}.panel button[aria-pressed="true"]{background:var(--brand);color:var(--on)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+nav.d a{padding:.45rem .65rem;font-size:.9rem}
+.star{background:none;border:0;font-size:1.6rem;color:var(--brand);padding:.1rem .15rem}
+body.spaced{line-height:2.2;word-spacing:.2em}
+body.ul a{text-decoration:underline!important}
+body.cur,body.cur *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M4 2l30 16-13 3 8 15-6 3-8-15-9 9z' fill='%23000' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 4 2,auto!important}
+#rul{display:none;position:fixed;left:0;right:0;top:40vh;height:3.2rem;background:rgba(255,235,0,.22);border-block:2px solid var(--brand);pointer-events:none;z-index:150}body.ruler #rul{display:block}
+@media print{body *{visibility:hidden}#ecard,#ecard *{visibility:visible}#ecard{position:absolute;top:0;right:0;width:100%}}
 </style>
 </head>
 <body>
@@ -174,6 +181,10 @@ footer{background:var(--deep);color:#fff;border-radius:var(--rl);margin-top:.75r
   <div class="tgl"><strong>تباين عالٍ</strong><button class="btn alt" data-t="hc" aria-pressed="false">إيقاف</button></div>
   <div class="tgl"><strong>خط سهل القراءة</strong><button class="btn alt" data-t="readable" aria-pressed="false">إيقاف</button></div>
   <div class="tgl"><strong>تقليل الحركة</strong><button class="btn alt" data-t="calm" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>تباعد أكبر بين الأسطر والكلمات</strong><button class="btn alt" data-t="spaced" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>تسطير الروابط</strong><button class="btn alt" data-t="ul" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>مسطرة قراءة</strong><button class="btn alt" data-t="ruler" aria-pressed="false">إيقاف</button></div>
+  <div class="tgl"><strong>مؤشر ماوس كبير</strong><button class="btn alt" data-t="cur" aria-pressed="false">إيقاف</button></div>
   <div class="tgl"><div><strong>قراءة الصفحة بصوت عالٍ</strong><div style="color:var(--soft)">بالعربية حسب أصوات جهازك</div></div><div class="row"><button class="btn br" data-a="read">🔊 اقرأ</button><button class="btn alt" data-a="stop">إيقاف</button></div></div>
   <p style="margin-top:1.5rem"><button class="btn alt" data-a="reset">إعادة الضبط</button></p>
  </div></section>
@@ -191,7 +202,26 @@ footer{background:var(--deep);color:#fff;border-radius:var(--rl);margin-top:.75r
   <div id="done" class="ok" role="status" hidden></div>
  </div></section>
 </div>
-</main>
+<div class="page" id="p-directory"><section class="hero sm"><div class="hin"><span class="ey">الدليل</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="دليل الجهات|الميسّرة" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2">
+  <p class="ok" style="margin:0 0 1.5rem;max-width:none">⚠ الجهات هنا أمثلة توضيحية لعرض الفكرة. الدليل الحقيقي يحتاج بيانات موثّقة من الجهات نفسها، وتقييماتك تُحفظ على جهازك فقط.</p>
+  <div class="row"><div><label for="fs">القطاع</label><select class="fi" id="fs"></select></div><div><label for="ff">التجهيز</label><select class="fi" id="ff"></select></div><div><label for="fq">بحث بالاسم</label><input class="fi" id="fq"></div></div>
+  <div class="grid" id="dl" aria-live="polite" style="margin-top:1rem"></div></div></section></div>
+<div class="page" id="p-profile"><section class="hero sm"><div class="hin"><span class="ey">ملفي</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="ملف|احتياجاتي" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2"><p style="color:var(--soft);max-width:40rem">سجّل احتياجاتك مرة واحدة ليتعبّأ بها طلبك تلقائياً. تُحفظ على جهازك فقط ولا تُرسل لأي جهة.</p>
+  <form id="pf"><label for="pn">الاسم</label><input class="fi" id="pn" autocomplete="name"><label for="pp">الهاتف</label><input class="fi" id="pp" type="tel" inputmode="tel" autocomplete="tel">
+  <fieldset style="border:0;margin-bottom:1rem"><legend style="font-weight:700;margin-bottom:.4rem">احتياجاتي</legend><div id="pneeds"></div></fieldset>
+  <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="pc" required> أوافق على حفظ هذه البيانات على جهازي فقط</label><br>
+  <div class="row"><button class="btn" type="submit">حفظ ملفي</button><button class="btn alt" type="button" id="pdel">مسح كل بياناتي</button></div></form>
+  <div id="pmsg" class="ok" role="status" hidden></div>
+  <h2 class="h2" style="margin-top:3rem;font-size:1.6rem">طلباتي السابقة</h2><div class="grid" id="phist"></div></div></section></div>
+<div class="page" id="p-emergency"><section class="hero sm"><div class="hin"><span class="ey">طوارئ</span><h1 class="title" style="font-size:clamp(2.4rem,7vw,5rem)" data-split="بطاقة|الطوارئ الطبية" tabindex="-1"></h1></div></section>
+ <section class="blk"><div class="in2"><p class="ok" style="margin:0 0 1.5rem;max-width:none">⚠ هذه البطاقة تُحفظ على جهازك وتساعد من حولك، ولا تتصل بأحد تلقائياً وليست بديلاً عن الإسعاف. في الخطر اتصل بالإسعاف 123.</p>
+  <form id="ef" style="margin-top:0"><label for="en">الاسم</label><input class="fi" id="en"><label for="eb">فصيلة الدم</label><select class="fi" id="eb"><option value="">غير محددة</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select>
+  <label for="ec">الحالات الصحية</label><textarea class="fi" id="ec" rows="2"></textarea><label for="em">الأدوية</label><textarea class="fi" id="em" rows="2"></textarea><label for="ea">الحساسية</label><input class="fi" id="ea">
+  <label for="ek">جهة الاتصال</label><input class="fi" id="ek"><label for="ep">هاتف جهة الاتصال</label><input class="fi" id="ep" type="tel" inputmode="tel"><button class="btn" type="submit">حفظ وعرض البطاقة</button></form>
+  <div id="eout" style="margin-top:1.5rem"></div></div></section></div>
+</main><div id="rul" aria-hidden="true"></div>
 
 <footer><div class="in2">
  <div class="cta"><div><span class="ey" style="color:rgba(255,255,255,.7)">ابدأ الآن</span><p>جاهز؟<br>ابدأ طلبك.</p></div><a class="btn lt2" href="#request">اطلب خدمة ميسّرة ←</a></div>
@@ -214,7 +244,7 @@ var SV=[{k:"h",i:"🏥",t:"المستشفيات والرعاية",d:"استقب�
 {k:"b",i:"🏦",t:"البنوك والمصارف",d:"خدمات مصرفية مستقلة وآمنة.",l:["خدمة عملاء بلغة الإشارة","عقود بطريقة برايل","ماكينات صراف ناطقة","دخول ميسّر للفروع"]},
 {k:"r",i:"🩺",t:"التأهيل والخدمات الصحية",d:"رعاية مستمرة ما بعد العلاج.",l:["علاج طبيعي وتأهيل","أجهزة تعويضية وكراسي متحركة","دعم نفسي للمرضى وأسرهم","توصيل الأدوية"]}];
 var GR=[{i:"🦽",t:"الإعاقة الحركية",d:"نصائح التنقل والأجهزة المساعدة والأماكن الميسّرة."},{i:"🤟",t:"الصم وضعاف السمع",d:"لغة الإشارة والتواصل مع الجهات وتجارب الخدمة."},{i:"🦯",t:"المكفوفون وضعاف البصر",d:"برايل وقارئات الشاشة والوصول المستقل."},{i:"❤️‍🩹",t:"الحالات الصحية الحرجة",d:"دعم المرضى ومرافقيهم وتنسيق الرعاية."},{i:"👨‍👩‍👧",t:"الأسر والمرافقون",d:"مساحة لتبادل الخبرة والدعم النفسي."}];
-var PG=[["home","الرئيسية"],["services","الخدمات"],["community","المجتمع"],["access","سهولة الوصول"],["request","طلب خدمة"]];
+var PG=[["home","الرئيسية"],["services","الخدمات"],["directory","الدليل"],["community","المجتمع"],["profile","ملفي"],["emergency","طوارئ"],["access","سهولة الوصول"],["request","طلب خدمة"]];
 $("#nav").innerHTML=PG.map(function(p){return '<li><a href="#'+p[0]+'">'+p[1]+'</a></li>'}).join('');
 $("#mlist").innerHTML=PG.map(function(p){return '<li><a href="#'+p[0]+'">'+p[1]+'</a></li>'}).join('');
 /* split reveal */
@@ -252,21 +282,50 @@ trust(0);$("#gn").onclick=function(){trust((ti+1)%TS.length)};$("#gp").onclick=f
 function menu(o){$("#menu").classList.toggle("open",o);$("#bg").setAttribute("aria-expanded",o);document.body.style.overflow=o?"hidden":""}
 $("#bg").onclick=function(){menu(true);$("#mc").focus()};$("#mc").onclick=function(){menu(false)};$("#mlist").onclick=function(){menu(false)};
 /* a11y */
-var S={size:100,hc:false,readable:false,calm:false};
+var S={size:100,hc:false,readable:false,calm:false,spaced:false,ul:false,ruler:false,cur:false};
 try{var sv=JSON.parse(localStorage.getItem("tamkeen_a11y")||"null");if(sv)S=Object.assign(S,sv)}catch(e){}
-function apply(){document.documentElement.style.fontSize=(16*S.size/100)+"px";["hc","readable","calm"].forEach(function(k){document.body.classList.toggle(k,!!S[k]);$$('[data-t="'+k+'"]').forEach(function(b){b.setAttribute("aria-pressed",S[k]);if(b.classList.contains("alt"))b.textContent=S[k]?"مفعّل":"إيقاف"})});$("#sv").textContent=S.size;try{localStorage.setItem("tamkeen_a11y",JSON.stringify(S))}catch(e){}}
+function apply(){document.documentElement.style.fontSize=(16*S.size/100)+"px";["hc","readable","calm","spaced","ul","ruler","cur"].forEach(function(k){document.body.classList.toggle(k,!!S[k]);$$('[data-t="'+k+'"]').forEach(function(b){b.setAttribute("aria-pressed",S[k]);if(b.classList.contains("alt"))b.textContent=S[k]?"مفعّل":"إيقاف"})});$("#sv").textContent=S.size;try{localStorage.setItem("tamkeen_a11y",JSON.stringify(S))}catch(e){}}
 function stopR(){if("speechSynthesis" in window)speechSynthesis.cancel()}
 function read(){if(!("speechSynthesis" in window)){alert("متصفحك لا يدعم القراءة الصوتية");return}stopR();var u=new SpeechSynthesisUtterance($(".page.on").innerText);u.lang="ar-EG";speechSynthesis.speak(u)}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-a],[data-t]");if(!b)return;if(b.dataset.t)S[b.dataset.t]=!S[b.dataset.t];else{var a=b.dataset.a;if(a==="bigger")S.size=Math.min(160,S.size+10);if(a==="smaller")S.size=Math.max(80,S.size-10);if(a==="reset")S={size:100,hc:false,readable:false,calm:false};if(a==="read")read();if(a==="stop")stopR()}apply()});
 $("#fb").onclick=function(){var o=$("#panel").classList.toggle("open");this.setAttribute("aria-expanded",o)};
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){menu(false);$("#panel").classList.remove("open");$("#fb").setAttribute("aria-expanded","false")}});
 apply();
+/* v3 features */
+function ld(k){try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}}
+function sv2(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+var F={ramp:"ممرات للكراسي المتحركة",sign:"لغة إشارة",braille:"برايل وماكينات ناطقة",comp:"مرافق طبي",desk:"شباك مخصص",home:"زيارة منزلية"};
+var DIR=[{n:"مستشفى نموذجي (مثال)",s:"h",f:["ramp","sign","comp"]},{n:"سجل مدني نموذجي (مثال)",s:"g",f:["desk","ramp","home"]},{n:"بنك نموذجي (مثال)",s:"b",f:["braille","sign","ramp"]},{n:"مركز تأهيل نموذجي (مثال)",s:"r",f:["ramp","comp","home"]},{n:"مستشفى تخصصي (مثال)",s:"h",f:["ramp","braille"]},{n:"مكتب جوازات (مثال)",s:"g",f:["desk","sign"]}];
+$("#fs").innerHTML='<option value="all">كل القطاعات</option>'+SV.map(function(x){return '<option value="'+x.k+'">'+x.t+'</option>'}).join('');
+$("#ff").innerHTML='<option value="all">أي تجهيز</option>'+Object.keys(F).map(function(k){return '<option value="'+k+'">'+F[k]+'</option>'}).join('');
+function renderDir(){var s=$("#fs").value,f=$("#ff").value,q=$("#fq").value.trim(),R=ld("tamkeen_rate")||{};
+ $("#dl").innerHTML=DIR.filter(function(d){return (s==="all"||d.s===s)&&(f==="all"||d.f.indexOf(f)>-1)&&(!q||d.n.indexOf(q)>-1)}).map(function(d){var r=R[d.n]||0;
+ return '<article class="card" style="display:block"><h3>'+d.n+'</h3><p style="font-size:.85rem">غير موثّقة بعد (بيانات توضيحية)</p><p>'+d.f.map(function(x){return '✓ '+F[x]}).join(' · ')+'</p><div role="group" aria-label="تقييم تجربتك">'+[1,2,3,4,5].map(function(n){return '<button class="star" data-r="'+n+'" data-n="'+d.n+'" aria-label="'+n+' من 5" aria-pressed="'+(r>=n)+'">'+(r>=n?"★":"☆")+'</button>'}).join('')+'</div><button class="btn br" style="margin-top:.8rem" data-q="'+d.n+'">اطلب خدمة هنا</button></article>'}).join('')||'<p>لا نتائج مطابقة.</p>'}
+["fs","ff"].forEach(function(i){$("#"+i).addEventListener("change",renderDir)});$("#fq").addEventListener("input",renderDir);
+$("#dl").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.r){var R=ld("tamkeen_rate")||{};R[b.dataset.n]=+b.dataset.r;sv2("tamkeen_rate",R);renderDir()}else if(b.dataset.q){$("#re").value=b.dataset.q;location.hash="#request"}});
+var NEEDS=["كرسي متحرك","لغة إشارة","برايل / قارئ شاشة","مرافق طبي","حالة صحية حرجة"];
+function prefill(){var p=ld("tamkeen_profile");if(!p)return;if(!$("#rn").value)$("#rn").value=p.name||"";if(!$("#rp").value)$("#rp").value=p.phone||"";if(!$("#rd").value&&p.needs&&p.needs.length)$("#rd").value=p.needs.join("، ")}
+function renderProfile(){var p=ld("tamkeen_profile")||{needs:[]},H=ld("tamkeen_reqs")||[];$("#pn").value=p.name||"";$("#pp").value=p.phone||"";
+ $("#pneeds").innerHTML=NEEDS.map(function(n){return '<label style="display:flex;gap:.5rem;align-items:center;font-weight:400"><input type="checkbox" value="'+n+'"'+((p.needs||[]).indexOf(n)>-1?" checked":"")+'> '+n+'</label>'}).join('');
+ $("#phist").innerHTML=H.map(function(h){return '<div class="card" style="display:block"><h3>'+esc(h.e)+'</h3><p>'+esc(h.d)+'</p><p style="font-size:.85rem">'+h.t+(h.u?" · عاجل":"")+' · مسجّل على جهازك (لم يُرسل)</p></div>'}).join('')||'<p style="color:var(--soft)">لا توجد طلبات بعد.</p>'}
+function msg(t){var m=$("#pmsg");m.hidden=false;m.textContent=t}
+document.addEventListener("submit",function(e){var id=e.target.id;
+ if(id==="rf"){var H=ld("tamkeen_reqs")||[];H.unshift({e:$("#re").value,d:$("#rd").value,u:$("#ru").checked,t:new Date().toLocaleDateString("ar-EG")});sv2("tamkeen_reqs",H.slice(0,20))}
+ if(id==="pf"){e.preventDefault();sv2("tamkeen_profile",{name:$("#pn").value.trim(),phone:$("#pp").value.trim(),needs:$$("#pneeds input:checked").map(function(i){return i.value})});msg("تم حفظ ملفك على جهازك.")}
+ if(id==="ef"){e.preventDefault();var c={};["en","eb","ec","em","ea","ek","ep"].forEach(function(k){c[k]=$("#"+k).value.trim()});sv2("tamkeen_card",c);drawCard(c)}},true);
+document.addEventListener("click",function(e){if(e.target.id==="pdel"){["tamkeen_profile","tamkeen_reqs","tamkeen_rate","tamkeen_card"].forEach(function(k){try{localStorage.removeItem(k)}catch(x){}});renderProfile();msg("تم مسح كل بياناتك من هذا الجهاز.")}
+ if(e.target.id==="epr"){try{window.print()}catch(x){}}});
+function drawCard(c){var o=$("#eout");if(!c){o.innerHTML="";return}var ph=(c.ep||"").replace(/[^0-9+]/g,"");
+ o.innerHTML='<div id="ecard" class="ok" style="margin-top:0"><h3>بطاقة طوارئ طبية</h3><p><strong>'+esc(c.en||"—")+'</strong> · فصيلة الدم: '+esc(c.eb||"غير محددة")+'</p><p>الحالات: '+esc(c.ec||"—")+'</p><p>الأدوية: '+esc(c.em||"—")+'</p><p>الحساسية: '+esc(c.ea||"—")+'</p><p>للتواصل: '+esc(c.ek||"—")+' '+esc(c.ep||"")+'</p></div><div class="row" style="margin-top:1rem"><a class="btn br" href="tel:123">📞 الإسعاف 123</a>'+(ph?'<a class="btn" href="sms:'+ph+'?body='+encodeURIComponent("أحتاج مساعدة عاجلة. "+(c.en||""))+'">✉ رسالة لجهة الاتصال</a>':'')+'<button class="btn alt" type="button" id="epr">طباعة</button></div>'}
+function renderCard(){var c=ld("tamkeen_card");["en","eb","ec","em","ea","ek","ep"].forEach(function(k){$("#"+k).value=(c&&c[k])||""});drawCard(c)}
+function rl(y){$("#rul").style.top=(y-26)+"px"}
+document.addEventListener("mousemove",function(e){rl(e.clientY)});document.addEventListener("touchmove",function(e){rl(e.touches[0].clientY)},{passive:true});
 /* routing */
 function route(){var h=(location.hash||"#home").slice(1);if(!PG.some(function(p){return p[0]===h}))h="home";
  $$(".page").forEach(function(p){p.classList.toggle("on",p.id==="p-"+h)});
  $$("#nav a").forEach(function(a){a.getAttribute("href")==="#"+h?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current")});
  var pg=$("#p-"+h),hd=$("h1",pg);window.scrollTo(0,0);stopR();if(hd&&hd.id!=="ht"){hd.classList.add("go");hd.focus({preventScroll:true})}
- document.title=(hd?hd.getAttribute("aria-label"):"تمكين")+" | تمكين"}
+ document.title=(hd?hd.getAttribute("aria-label"):"تمكين")+" | تمكين";if(h==="request")prefill();if(h==="profile")renderProfile();if(h==="emergency")renderCard();if(h==="directory")renderDir()}
 window.addEventListener("hashchange",route);route();
 /* loader */
 var done=false;function reveal(){if(done)return;done=true;var l=$("#loader");l.classList.add("out");$("#ht").classList.add("go");$("#ht").setAttribute("tabindex","-1");setTimeout(function(){l.remove()},S.calm?0:900)}
