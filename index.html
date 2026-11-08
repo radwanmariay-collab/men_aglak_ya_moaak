@@ -204,6 +204,51 @@ body.hc .bgv{display:none}
 .vslot{position:absolute;left:1rem;top:1rem;z-index:3;display:flex;align-items:center;gap:.5rem;padding:.55rem 1rem;border-radius:9rem;color:#fff;font-size:.9rem;font-weight:700;background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06));border:1.5px dashed rgba(255,255,255,.7);-webkit-backdrop-filter:blur(12px) saturate(1.8);backdrop-filter:blur(12px) saturate(1.8);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 .vslot small{opacity:.85;font-weight:500;direction:ltr}
 .bgv.on~.vslot{display:none}
+/* ===== v8: deck, glass dock, chat, voice ===== */
+.deck{position:relative;height:25rem;perspective:1400px;margin:2.5rem auto 1rem;max-width:64rem}
+.dc{--o:0;--ab:0;position:absolute;top:0;left:50%;width:min(19rem,72vw);height:100%;margin-left:calc(min(19rem,72vw)/-2);padding:1.6rem;border-radius:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;text-align:center;background:var(--card);border:2px solid var(--line);isolation:isolate;transform:translateX(calc(var(--o)*68%)) translateZ(calc(var(--ab)*-120px)) rotateY(calc(var(--o)*-34deg)) scale(calc(1 - var(--ab)*.06));opacity:calc(1 - var(--ab)*.5);z-index:calc(5 - var(--ab));transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .6s}
+.dc[aria-hidden="true"]{cursor:pointer}.dc h3{font-size:1.5rem}.dc p{color:var(--soft)}
+.orbi{width:5.2rem;height:5.2rem;border-radius:50%;display:grid;place-items:center;font-size:2.6rem;background:rgba(151,188,98,.25);border:1px solid var(--gb)}.tg2{font-size:.8rem;font-weight:700;color:var(--soft)}
+body:not(.hc):not(.noglass) .dc{background:linear-gradient(160deg,var(--gl),var(--gl2));border:1px solid var(--gb);-webkit-backdrop-filter:blur(22px) saturate(2);backdrop-filter:blur(22px) saturate(2);box-shadow:inset 0 2px 1px var(--gt),inset 0 -16px 34px rgba(151,188,98,.2),0 30px 60px var(--gs)}
+body:not(.hc):not(.noglass) .dc::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(120deg,rgba(255,255,255,.55),transparent 42%);pointer-events:none}
+body:not(.hc):not(.noglass) .orbi{background:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.15));box-shadow:inset 0 2px 1px #fff,0 10px 24px var(--gs)}
+.fab{display:flex;flex-direction:column-reverse;gap:.7rem;align-items:center}
+.fab>button.orb{width:3.4rem;height:3.4rem;font-size:1.45rem;display:grid;place-items:center;transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .4s}
+.fab>button.orb.main{width:3.9rem;height:3.9rem;font-size:1.8rem}
+.orb:hover{transform:scale(1.12) translateY(-2px)}.orb:active{transform:scale(.93)}
+body:not(.hc):not(.noglass) .fab>button.orb{color:#fff;background:linear-gradient(135deg,rgba(44,95,45,.78),rgba(10,31,17,.5));border:1px solid rgba(255,255,255,.6);-webkit-backdrop-filter:blur(16px) saturate(2.2);backdrop-filter:blur(16px) saturate(2.2);box-shadow:inset 0 2px 1px rgba(255,255,255,.75),inset 0 -8px 14px rgba(255,255,255,.12),0 12px 30px rgba(0,0,0,.35)}
+.fab>button.orb[aria-pressed="true"],.fab>button.orb[aria-expanded="true"]{background:linear-gradient(135deg,rgba(151,188,98,.95),rgba(44,95,45,.7))}
+.fab>button.orb[aria-pressed="true"]{animation:pls 1.6s infinite}
+@keyframes pls{from{box-shadow:0 0 0 0 rgba(151,188,98,.7)}to{box-shadow:0 0 0 1rem rgba(151,188,98,0)}}
+.fab .panel{display:block;position:absolute;left:4.8rem;bottom:0;width:min(19rem,calc(100vw - 6.8rem));padding:1rem;border-radius:1.9rem;opacity:0;visibility:hidden;transform:translateX(-16px) scale(.8);transform-origin:left bottom;transition:opacity .35s,transform .65s cubic-bezier(.34,1.45,.64,1),visibility 0s .65s}
+.fab .panel.open{opacity:1;visibility:visible;transform:none;transition:opacity .35s,transform .65s cubic-bezier(.34,1.45,.64,1)}
+body:not(.hc):not(.noglass) .fab .panel{background:linear-gradient(160deg,var(--gl),var(--gl2))!important;-webkit-backdrop-filter:blur(26px) saturate(2.2);backdrop-filter:blur(26px) saturate(2.2);border:1px solid var(--gb)!important;box-shadow:inset 0 2px 1px var(--gt),inset 0 -14px 30px rgba(151,188,98,.15),0 24px 60px var(--gs)}
+.ptitle{font-weight:800;margin-bottom:.7rem;padding:0 .2rem}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.tiles button{display:grid;place-items:center;gap:.1rem;padding:.55rem .1rem;border-radius:1.1rem;font-size:.72rem;font-weight:700;text-align:center;background:var(--gl);border:1px solid var(--gb);box-shadow:inset 0 1px 0 rgba(255,255,255,.9);transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.tiles button b{font-size:1.15rem;line-height:1.3}.tiles button:hover{transform:translateY(-3px) scale(1.06)}
+.fab .panel button[aria-pressed="true"]{background:var(--brand);color:var(--on)}
+.panel.open .tiles button{animation:tp .55s both cubic-bezier(.34,1.56,.64,1);animation-delay:calc(var(--i)*45ms)}
+@keyframes tp{from{opacity:0;transform:translateY(12px) scale(.7)}}
+.panel .all{display:block;margin-top:.8rem;font-weight:700;font-size:.9rem;text-decoration:underline}
+.chat{position:fixed;left:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));width:min(26rem,calc(100vw - 2rem));max-height:min(34rem,76svh);z-index:95;display:flex;flex-direction:column;border-radius:1.9rem;overflow:hidden;background:var(--card);border:2px solid var(--brand);color:var(--fg);transform-origin:left bottom;animation:chin .6s cubic-bezier(.34,1.35,.64,1)}
+@keyframes chin{from{opacity:0;transform:translateY(20px) scale(.85)}}
+.chat[hidden]{display:none}
+body:not(.hc):not(.noglass) .chat{background:linear-gradient(160deg,var(--gl),var(--gl2));-webkit-backdrop-filter:blur(26px) saturate(2.2);backdrop-filter:blur(26px) saturate(2.2);border:1px solid var(--gb);box-shadow:inset 0 2px 1px var(--gt),0 30px 70px var(--gs)}
+.chat header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.1rem;font-weight:800;border-bottom:1px solid var(--line)}
+.chat header small{display:block;font-weight:500;font-size:.78rem;color:var(--soft)}
+.chat header button{width:2.3rem;height:2.3rem;border-radius:50%;background:var(--gl);border:1px solid var(--gb)}
+.cm{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;min-height:12rem}
+.m{max-width:86%;padding:.6rem .95rem;border-radius:1.25rem;line-height:1.7;white-space:pre-wrap;animation:mi .5s cubic-bezier(.34,1.45,.64,1)}
+@keyframes mi{from{opacity:0;transform:translateY(10px) scale(.92)}}
+.m.b{align-self:flex-start;background:var(--gl);border:1px solid var(--gb);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.m.u{align-self:flex-end;background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 65%,transparent));color:var(--on)}
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;padding:0 1rem .7rem}
+.chips button{padding:.35rem .8rem;border-radius:9rem;font-size:.82rem;font-weight:700;background:var(--gl);border:1px solid var(--gb)}
+.chat form{display:flex;gap:.4rem;padding:.7rem;max-width:none;margin:0;border-top:1px solid var(--line);align-items:center}.chat .fi{margin:0;flex:1}
+.chat .mic{width:2.8rem;height:2.8rem;flex:none;font-size:1.1rem}.chat .btn{padding:.6rem 1.1rem}
+#vtoast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:120;max-width:90vw;padding:.7rem 1.3rem;border-radius:9rem;color:#fff;font-weight:700;background:linear-gradient(135deg,rgba(10,31,17,.85),rgba(10,31,17,.65));border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .4s,transform .6s cubic-bezier(.34,1.45,.64,1)}
+#vtoast.on{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -235,7 +280,7 @@ body.hc .bgv{display:none}
   <div class="badge"><div class="pct rise"><div><b>3</b><br>خطوات فقط لتجهيز استقبالك</div></div>
   <div class="bc rise" style="--d:.12s"><strong>#01</strong><div><h3 style="font-size:1.1rem">مجتمع يدعمك</h3><p>من الإعاقة الحركية إلى الحالات الصحية الحرجة، تجد هنا من يشاركك التجربة والنصيحة.</p></div></div></div>
   <h2 class="ghostw" id="gw" aria-live="polite"></h2>
-  <figure class="cc rise" id="cc"></figure>
+  <div class="deck rise" id="deck" role="group" aria-label="مجموعات المجتمع"></div>
   <div class="ctl"><button class="ar" id="gp" aria-label="السابق">→</button><div class="dots" id="gd" style="margin:0"></div><button class="ar f" id="gn" aria-label="التالي">←</button></div>
  </div></section>
 
@@ -325,9 +370,20 @@ body.hc .bgv{display:none}
  <div class="copy">© 2026 تمكين. جميع الحقوق محفوظة.</div>
 </div></footer>
 
-<div class="fab"><div class="panel" id="panel" role="group" aria-label="سهولة الوصول">
- <button data-a="bigger">تكبير الخط أ+</button><button data-a="smaller">تصغير الخط أ−</button><button data-t="hc" aria-pressed="false">تباين عالٍ</button><button data-a="read">🔊 قراءة الصفحة</button><button data-a="stop">إيقاف القراءة</button></div>
- <button id="fb" aria-label="أدوات سهولة الوصول" aria-expanded="false" aria-controls="panel">♿</button></div>
+<div class="fab" id="fab">
+ <div class="panel" id="panel" role="group" aria-label="سهولة الوصول"><div class="ptitle">سهولة الوصول</div>
+  <div class="tiles"><button data-a="bigger"><b>أ+</b>تكبير</button><button data-a="smaller"><b>أ−</b>تصغير</button><button data-t="hc" aria-pressed="false"><b>◐</b>تباين</button><button data-t="readable" aria-pressed="false"><b>Aa</b>خط واضح</button><button data-t="calm" aria-pressed="false"><b>◌</b>هدوء</button><button data-t="noglass" aria-pressed="false"><b>▢</b>بدون زجاج</button><button data-a="read"><b>🔊</b>اقرأ</button><button data-a="stop"><b>⏹</b>إيقاف</button></div>
+  <a class="all" href="#access">كل الإعدادات ←</a></div>
+ <button class="orb" id="cb" aria-label="المساعد الذكي" aria-expanded="false" aria-controls="chat"><span>💬</span></button>
+ <button class="orb" id="vc" aria-label="التحكم بالأوامر الصوتية" aria-pressed="false"><span>🎤</span></button>
+ <button class="orb main" id="fb" aria-label="أدوات سهولة الوصول" aria-expanded="false" aria-controls="panel"><span>♿</span></button>
+</div>
+<section class="chat" id="chat" role="dialog" aria-label="مساعد تمكين" hidden>
+ <header><div>🤖 مساعد تمكين<small id="cs">مساعد مبسّط</small></div><button id="cx" aria-label="إغلاق المساعد">✕</button></header>
+ <div class="cm" id="cm" role="log" aria-live="polite"></div><div class="chips" id="cchips"></div>
+ <form id="cf" autocomplete="off"><input class="fi" id="ci" aria-label="اكتب سؤالك" placeholder="اسأل عن الخدمات أو اطلب صفحة…"><button class="orb mic" type="button" id="cmic" aria-label="تحدث بدل الكتابة">🎤</button><button class="btn br" type="submit">إرسال</button></form>
+</section>
+<div id="vtoast" role="status" aria-live="polite"></div>
 
 <script>
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
@@ -373,7 +429,7 @@ function slide(i,fast){si=i;var c=$("#sc"),s=SV[i];function f(){c.innerHTML='<di
  if(fast){f()}else{c.classList.add("fade");setTimeout(f,300)}}
 slide(0,true);var sT=setInterval(function(){if(!document.hidden&&$("#p-home").classList.contains("on"))slide((si+1)%SV.length)},3800);
 /* trust carousel */
-var TS=[{w:["مجتمع","يفهمك","ويدعمك","دائماً"],i:"🦽",n:"مجتمع الحركة",r:"مجموعة دعم"},{w:["صوتك","مسموع","وحقك","محفوظ"],i:"🤟",n:"الصم وضعاف السمع",r:"مجموعة دعم"},{w:["وصول","مستقل","لكل","شخص"],i:"🦯",n:"المكفوفون",r:"مجموعة دعم"}],ti=0;
+var TS=[{w:["مجتمع","يفهمك","ويدعمك","دائماً"],i:"🦽",n:"مجتمع الحركة",r:"مجموعة دعم",d:"نصائح التنقل والأجهزة المساعدة وأماكن ميسّرة جرّبها أعضاء المجتمع."},{w:["صوتك","مسموع","وحقك","محفوظ"],i:"🤟",n:"الصم وضعاف السمع",r:"مجموعة دعم",d:"لغة الإشارة وتجارب الخدمة والتواصل مع الجهات بطريقة تحترم حقك."},{w:["وصول","مستقل","لكل","شخص"],i:"🦯",n:"المكفوفون",r:"مجموعة دعم",d:"برايل وقارئات الشاشة وطرق الوصول المستقل للخدمات والمعلومات."}],ti=0;
 function trust(i){ti=i;var t=TS[i],w=t.w.map(function(x,j){return '<span class="w'+'"><span class="i" style="transition-delay:'+(j*120)+'ms">'+x+'</span></span>'});
  var g=$("#gw");g.classList.remove("go");g.setAttribute("aria-label",t.w.join(" "));
  g.innerHTML='<span class="r"><span class="'+'">'+w[0]+'</span><span>'+w[1]+'</span></span><span class="r"><span class="k">'+w[2]+'</span><span>'+w[3]+'</span></span>';
@@ -448,6 +504,84 @@ function moveInd(){var a=$("#nav a[aria-current]");if(!a||!a.offsetWidth){ind.st
  ind.style.width=a.offsetWidth+"px";ind.style.height=a.offsetHeight+"px";ind.style.transform="translate("+a.offsetLeft+"px,"+a.offsetTop+"px)";ind.style.opacity=1;
  if(f1){f1=false;requestAnimationFrame(function(){requestAnimationFrame(function(){ind.style.transition=""})})}}
 window.addEventListener("resize",moveInd);window.addEventListener("load",moveInd);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveInd);
+/* v8 deck */
+var deckBuilt=false;
+function buildDeck(){$("#deck").innerHTML=TS.map(function(t,j){return '<article class="dc" data-j="'+j+'"><div class="orbi" aria-hidden="true">'+t.i+'</div><span class="tg2">'+t.r+'</span><h3>'+t.n+'</h3><p>'+t.d+'</p><a class="btn br" href="#community">انضم للمجموعة</a></article>'}).join('');deckBuilt=true}
+function trust(i){ti=i;var t=TS[i],n=TS.length;
+ var g=$("#gw");g.classList.remove("go");g.setAttribute("aria-label",t.w.join(" "));
+ var w=t.w.map(function(x,j){return '<span class="w"><span class="i" style="transition-delay:'+(j*120)+'ms">'+x+'</span></span>'});
+ g.innerHTML='<span class="r"><span>'+w[0]+'</span><span>'+w[1]+'</span></span><span class="r"><span class="k">'+w[2]+'</span><span>'+w[3]+'</span></span>';
+ $$(".w",g).forEach(function(x){x.setAttribute("aria-hidden","true")});requestAnimationFrame(function(){requestAnimationFrame(function(){g.classList.add("go")})});
+ if(!deckBuilt)buildDeck();
+ $$(".dc").forEach(function(c,j){var d=(j-i+n)%n;if(d>n/2)d-=n;c.style.setProperty("--o",d);c.style.setProperty("--ab",Math.abs(d));c.setAttribute("aria-hidden",d!==0);$("a",c).tabIndex=d===0?0:-1});
+ dots($("#gd"),n,i,trust)}
+trust(ti);
+$("#deck").addEventListener("click",function(e){var c=e.target.closest(".dc");if(c&&c.getAttribute("aria-hidden")==="true")trust(+c.dataset.j)});
+(function(){var x0=null,dk=$("#deck");dk.addEventListener("pointerdown",function(e){x0=e.clientX});dk.addEventListener("pointerup",function(e){if(x0===null)return;var dx=e.clientX-x0;x0=null;if(Math.abs(dx)>50)trust(dx<0?(ti+1)%TS.length:(ti+TS.length-1)%TS.length)})})();
+$$(".tiles button").forEach(function(b,i){b.style.setProperty("--i",i)});
+/* v8 assistant */
+function norm(t){return String(t).replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase()}
+function kbText(){return "الموقع: تمكين منصة مجتمعية تجريبية لتيسير الخدمات لذوي الإعاقة والحالات الصحية الحرجة. الصفحات: الرئيسية (home)، الخدمات (services)، الدليل (directory) جهات توضيحية غير موثقة مع تقييم يحفظ على جهاز المستخدم، المجتمع (community) مجموعات ومنشورات تظهر في الجلسة فقط، ملفي (profile) يحفظ احتياجات المستخدم على جهازه فقط، طوارئ (emergency) بطاقة طبية محلية مع اتصال بالإسعاف 123 ورسالة SMS لجهة اتصال، سهولة الوصول (access)، طلب خدمة (request) والطلب لا يرسل لأي جهة حقيقية حاليا. الخدمات: "+SV.map(function(x){return x.t+": "+x.d+" "+LONG[x.k]+" التجهيزات: "+x.l.join("، ")}).join(" | ")+". المجموعات: "+GR.map(function(g){return g.t+" ("+g.d+")"}).join("، ")+". أدوات سهولة الوصول: تكبير وتصغير الخط، تباين عال، خط سهل القراءة، تقليل الحركة، إيقاف الزجاج، تباعد الأسطر، تسطير الروابط، مسطرة قراءة، مؤشر كبير، قراءة الصفحة بصوت عال، وأوامر صوتية مثل: افتح الخدمات، كبر الخط، تباين، اقرأ الصفحة."}
+var PN={home:"الرئيسية",services:"الخدمات",directory:"الدليل",community:"المجتمع",profile:"ملفي",emergency:"الطوارئ",access:"سهولة الوصول",request:"طلب خدمة"};
+function localAnswer(q){var t=norm(q);function h(){return [].slice.call(arguments).some(function(k){return t.indexOf(norm(k))>-1})}
+ var nav=[["emergency","طوارئ","بطاقه"],["profile","ملفي","ملف"],["directory","دليل"],["community","مجتمع","مجموعات"],["access","سهوله","اعدادات"],["request","طلب"],["services","خدمات"],["home","رئيسيه"]];
+ if(h("افتح","وديني","روح","انتقل","خدني")){for(var i=0;i<nav.length;i++)if(h.apply(null,nav[i].slice(1)))return{text:"تمام، فتحت لك صفحة "+PN[nav[i][0]]+".",go:nav[i][0]}}
+ var K={h:["مستشف","دكتور","كشف","علاج","مرافق طبي"],g:["حكوم","سجل","جواز","ورق","بطاقه","مصلح","موظف"],b:["بنك","بنوك","صراف","حساب","برايل","فلوس"],r:["تاهيل","طبيعي","كرسي","اجهز","دعم نفسي","ادويه"]};
+ for(var k in K)if(h.apply(null,K[k])){var sv=SV.filter(function(x){return x.k===k})[0];return{text:sv.t+": "+LONG[k]+"\nالتجهيزات: "+sv.l.join("، ")+".",go:"services"}}
+ if(h("اسعاف","طوارئ","خطر","استغاث"))return{text:"في الخطر اتصل بالإسعاف 123 فوراً. تقدر تجهّز بطاقة طوارئ طبية على جهازك في صفحة الطوارئ، لكنها مش بديل عن الإسعاف.",go:"emergency"};
+ if(h("خصوصيه","بيانات","اتحفظ","امان"))return{text:"ملفك وبطاقة الطوارئ وتقييماتك بتتحفظ على جهازك فقط ومبتتبعتش لأي جهة. تقدر تمسحها كلها من صفحة ملفي."};
+ if(h("اطلب","اقدم","تقديم","سجل"))return{text:"طلب الخدمة 3 خطوات: اختر القطاع والجهة، اكتب التجهيز اللي محتاجه، وأرسل الطلب. الموقع نسخة تجريبية فالطلب لسه مش بيوصل لجهة حقيقية.",go:"request"};
+ if(h("مجتمع","مجموع","شارك"))return{text:"عندنا مجموعات للإعاقة الحركية والصم والمكفوفين والحالات الصحية الحرجة والأسر، وتقدر تشارك تجربتك في صفحة المجتمع.",go:"community"};
+ if(h("صوت","اوامر","ميكروفون","اتكلم"))return{text:"اضغط زر 🎤 وقل مثلاً: افتح الخدمات، كبّر الخط، تباين، اقرأ الصفحة، افتح المساعد، أو افتح الطوارئ."};
+ if(h("خط","تباين","وصول","كبر","الوان","قراء"))return{text:"في صفحة سهولة الوصول (وفي زر ♿): تكبير الخط، تباين عالٍ، خط سهل القراءة، تقليل الحركة، إيقاف الزجاج، قراءة الصفحة بصوت عالٍ، ومسطرة قراءة.",go:"access"};
+ if(h("تمكين","ايه الموقع","فكره","انتم"))return{text:"تمكين منصة مجتمعية تساعد ذوي الإعاقة والحالات الصحية الحرجة: نجهّز الجهة قبل وصولك، ونوفر مجتمعاً للدعم، وأدوات سهولة وصول. وهي حالياً نسخة تجريبية."};
+ return{text:"أقدر أساعدك في: شرح الخدمات، طريقة طلب خدمة، المجموعات، بطاقة الطوارئ، سهولة الوصول، أو فتح أي صفحة. جرّب تسألني عن واحدة منهم."}}
+var hist=[],aiOff=false,greeted=false;
+function addMsg(r,t){var d=document.createElement("div");d.className="m "+r;d.textContent=t;$("#cm").appendChild(d);$("#cm").scrollTop=1e5;return d}
+function clean(t){return String(t).replace(/\[\[go:\w+\]\]/g,"").trim()}
+function chatOpen(o){$("#chat").hidden=!o;$("#cb").setAttribute("aria-expanded",o);if(o){if(!greeted){greeted=true;addMsg("b","أهلاً! أنا مساعد تمكين. اسألني عن الخدمات أو طريقة الطلب، أو قل لي أفتح لك أي صفحة.")}$("#ci").focus()}}
+async function sendChat(q){q=q.trim();if(!q)return;addMsg("u",q);$("#ci").value="";var b=addMsg("b","…"),ok=false;
+ if(!aiOff&&window.claude&&claude.use){try{var sm=await claude.use("sample");if(sm){var pr="أنت «مساعد تمكين» داخل موقع تمكين. اعتمد فقط على معلومات الموقع التالية:\n"+kbText()+"\nالقواعد: أجب بالعربية المصرية المبسطة في 3 جمل كحد أقصى؛ لا تخترع جهات أو أرقاما أو وعودا غير مذكورة؛ وضّح عند الحاجة أن الموقع نسخة تجريبية وأن الطلبات لا ترسل لجهة حقيقية؛ في أي حالة طبية طارئة انصح بالاتصال بالإسعاف 123؛ لا تقدم تشخيصا طبيا. إن كان الأفضل فتح صفحة فأضف في آخر ردك [[go:اسم_الصفحة]] باستخدام الأسماء الإنجليزية بين الأقواس.\nالمحادثة:\n"+hist.slice(-6).map(function(m){return (m.r==="u"?"المستخدم: ":"المساعد: ")+m.t}).join("\n")+"\nالمستخدم: "+q;
+  var r=await sm(pr,{cache:false,modelTier:"quick",onText:function(x){b.textContent=clean(x.text)||"…"}});
+  b.textContent=clean(r.text);hist.push({r:"u",t:q},{r:"b",t:clean(r.text)});var m=/\[\[go:(\w+)\]\]/.exec(r.text);if(m&&PN[m[1]])location.hash="#"+m[1];ok=true;$("#cs").textContent="مدعوم بالذكاء الاصطناعي"}}catch(e){if(e&&e.code==="not_granted")aiOff=true}}
+ if(!ok){var a=localAnswer(q);b.textContent=a.text;hist.push({r:"u",t:q},{r:"b",t:a.text});$("#cs").textContent="مساعد مبسّط";if(a.go)location.hash="#"+a.go}
+ $("#cm").scrollTop=1e5}
+$("#cb").onclick=function(){chatOpen($("#chat").hidden)};$("#cx").onclick=function(){chatOpen(false)};
+$("#cf").addEventListener("submit",function(e){e.preventDefault();sendChat($("#ci").value)});
+$("#cchips").innerHTML=["إزاي أطلب خدمة؟","إيه خدمات المستشفيات؟","بيانات الصحة بتتحفظ فين؟","إيه أوامر الصوت؟"].map(function(x){return '<button type="button">'+x+'</button>'}).join('');
+$("#cchips").addEventListener("click",function(e){var b=e.target.closest("button");if(b)sendChat(b.textContent)});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")chatOpen(false)});
+/* v8 voice */
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null,vOn=false,tt=0;
+function toast(t){var el=$("#vtoast");el.textContent=t;el.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){el.classList.remove("on")},4500)}
+function runCmd(txt){var t=norm(txt);function h(){return [].slice.call(arguments).some(function(k){return t.indexOf(norm(k))>-1})}
+ if(h("كبر")&&h("خط")){S.size=Math.min(160,S.size+10);apply();return "كبّرت الخط"}
+ if(h("صغر")&&h("خط")){S.size=Math.max(80,S.size-10);apply();return "صغّرت الخط"}
+ if(h("تباين")){S.hc=!S.hc;apply();return "غيّرت التباين"}
+ if(h("بدون زجاج","ايقاف الزجاج")){S.noglass=!S.noglass;apply();return "غيّرت الزجاج"}
+ if(h("خط واضح","خط سهل")){S.readable=!S.readable;apply();return "غيّرت الخط"}
+ if(h("هدوء","تقليل الحركه","قلل الحركه")){S.calm=!S.calm;apply();return "غيّرت الحركة"}
+ if(h("وقف القراءه","اسكت","كفايه")){stopR();return "أوقفت القراءة"}
+ if(h("اقرا","قراءه الصفحه")){read();return "جاري القراءة"}
+ if(h("ايقاف الصوت","وقف التحكم","اقفل الصوت")){setVoice(false);return "أوقفت التحكم الصوتي"}
+ if(h("اقفل المساعد","اغلق المساعد")){chatOpen(false);return "أغلقت المساعد"}
+ if(h("مساعد","ساعدني","شات")){chatOpen(true);return "فتحت المساعد"}
+ if(h("فوق","اعلي")){window.scrollTo({top:0,behavior:"smooth"});return "للأعلى"}
+ if(h("انزل","اسفل")){window.scrollBy({top:innerHeight*.8,behavior:"smooth"});return "للأسفل"}
+ var nav=[["emergency","طوارئ","اسعاف"],["profile","ملفي","ملف"],["directory","دليل"],["community","مجتمع","مجموعات"],["access","سهوله","اعدادات"],["request","طلب"],["services","خدمات"],["home","رئيسيه","ابدا"]];
+ for(var i=0;i<nav.length;i++)if(h.apply(null,nav[i].slice(1))){location.hash="#"+nav[i][0];return "فتحت "+PN[nav[i][0]]}
+ return null}
+function mkRec(lang,cont){var r=new SR();r.lang=lang;r.continuous=cont;r.interimResults=false;return r}
+function setVoice(on){if(!SR){toast("متصفحك لا يدعم الأوامر الصوتية. جرّب Chrome.");return}
+ vOn=on;$("#vc").setAttribute("aria-pressed",on);
+ if(on){rec=mkRec("ar-EG",true);
+  rec.onresult=function(e){var x=e.results[e.results.length-1][0].transcript,m=runCmd(x);toast("🎤 "+x+(m?" ← "+m:" (لم أفهم الأمر)"))};
+  rec.onerror=function(e){if(e.error==="not-allowed"||e.error==="service-not-allowed"){vOn=false;$("#vc").setAttribute("aria-pressed","false");toast("المتصفح منع الميكروفون. اسمح له من إعدادات الموقع.")}};
+  rec.onend=function(){if(vOn){try{rec.start()}catch(x){}}};
+  try{rec.start();toast("🎤 بسمعك… قل مثلاً: افتح الخدمات")}catch(x){}}
+ else{try{rec&&rec.stop()}catch(x){}toast("تم إيقاف التحكم الصوتي")}}
+$("#vc").onclick=function(){setVoice(!vOn)};
+$("#cmic").onclick=function(){if(!SR){toast("متصفحك لا يدعم الإدخال الصوتي. جرّب Chrome.");return}var r=mkRec("ar-EG",false);r.onresult=function(e){sendChat(e.results[0][0].transcript)};r.onerror=function(){toast("تعذّر الوصول للميكروفون")};try{r.start();toast("🎤 تحدّث الآن…")}catch(x){}};
 /* routing */
 var firstR=true;if(document.startViewTransition)document.documentElement.classList.add("vt");
 function route(){var rm=matchMedia("(prefers-reduced-motion:reduce)").matches||document.body.classList.contains("calm");if(!firstR&&document.startViewTransition&&!rm){document.startViewTransition(route0)}else route0();firstR=false}
