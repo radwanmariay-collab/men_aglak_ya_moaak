@@ -249,6 +249,7 @@ body:not(.hc):not(.noglass) .chat{background:linear-gradient(160deg,var(--gl),va
 .chat .mic{width:2.8rem;height:2.8rem;flex:none;font-size:1.1rem}.chat .btn{padding:.6rem 1.1rem}
 #vtoast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:120;max-width:90vw;padding:.7rem 1.3rem;border-radius:9rem;color:#fff;font-weight:700;background:linear-gradient(135deg,rgba(10,31,17,.85),rgba(10,31,17,.65));border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .4s,transform .6s cubic-bezier(.34,1.45,.64,1)}
 #vtoast.on{opacity:1;transform:translate(-50%,0)}
+body.bignav nav.d ul{display:none!important}body.bignav .burger{display:grid!important}
 </style>
 </head>
 <body>
@@ -324,6 +325,7 @@ body:not(.hc):not(.noglass) .chat{background:linear-gradient(160deg,var(--gl),va
   <div class="tgl"><strong>مسطرة قراءة</strong><button class="btn alt" data-t="ruler" aria-pressed="false">إيقاف</button></div>
   <div class="tgl"><strong>مؤشر ماوس كبير</strong><button class="btn alt" data-t="cur" aria-pressed="false">إيقاف</button></div>
   <div class="tgl"><div><strong>قراءة الصفحة بصوت عالٍ</strong><div style="color:var(--soft)">بالعربية حسب أصوات جهازك</div></div><div class="row"><button class="btn br" data-a="read">🔊 اقرأ</button><button class="btn alt" data-a="stop">إيقاف</button></div></div>
+  <p class="lead" style="margin-top:1.5rem">🎤 التحكم الصوتي يفهم العامية. اضغط زر الميكروفون وقل: «ايه الاوامر؟» لعرض كل الأوامر، أو جرّب: «انزل شوية»، «كبّر الخط»، «اكتب في الاسم أحمد».</p>
   <p style="margin-top:1.5rem"><button class="btn alt" data-a="reset">إعادة الضبط</button></p>
  </div></section>
 </div>
@@ -582,6 +584,94 @@ function setVoice(on){if(!SR){toast("متصفحك لا يدعم الأوامر �
  else{try{rec&&rec.stop()}catch(x){}toast("تم إيقاف التحكم الصوتي")}}
 $("#vc").onclick=function(){setVoice(!vOn)};
 $("#cmic").onclick=function(){if(!SR){toast("متصفحك لا يدعم الإدخال الصوتي. جرّب Chrome.");return}var r=mkRec("ar-EG",false);r.onresult=function(e){sendChat(e.results[0][0].transcript)};r.onerror=function(){toast("تعذّر الوصول للميكروفون")};try{r.start();toast("🎤 تحدّث الآن…")}catch(x){}};
+/* v9 nav fix */
+function moveInd(instant){var a=$("#nav a[aria-current]");if(!a||!a.offsetWidth){ind.style.opacity=0;return}
+ if(instant||f1)ind.style.transition="none";
+ ind.style.width=a.offsetWidth+"px";ind.style.height=a.offsetHeight+"px";ind.style.transform="translate("+a.offsetLeft+"px,"+a.offsetTop+"px)";ind.style.opacity=1;
+ if(instant||f1){void ind.offsetWidth;requestAnimationFrame(function(){ind.style.transition=""});f1=false}}
+function navMode(){document.body.classList.toggle("bignav",innerWidth<1100+(S.size-100)*11)}
+var _ap=apply;apply=function(){_ap();navMode();requestAnimationFrame(function(){moveInd(true)})};
+window.addEventListener("resize",navMode);navMode();
+if(window.ResizeObserver){var ro=new ResizeObserver(function(){moveInd(true)});ro.observe($("#nav"));ro.observe(document.body);$$("#nav a").forEach(function(a){ro.observe(a)})}
+/* v9 voice engine */
+var AD="٠١٢٣٤٥٦٧٨٩",NW={صفر:0,واحد:1,واحده:1,اتنين:2,اثنين:2,تلاته:3,ثلاثه:3,اربعه:4,خمسه:5,سته:6,سبعه:7,تمانيه:8,ثمانيه:8,تسعه:9};
+function digits(x){return String(x).replace(/[٠-٩]/g,function(d){return AD.indexOf(d)}).split(/\s+/).map(function(w){var n=NW[norm(w)];return n===undefined?w:n}).join("").replace(/[^0-9+]/g,"")}
+var VH="أوامر تقدر تقولها بالعامية:\n• تنقل: افتح الخدمات / وديني للمجتمع / ارجع للرئيسية / ارجع\n• تمرير: انزل شوية / اطلع شوية بسيطة / انزل كتير / روح لتحت خالص / اطلع لفوق\n• الخط والشاشة: كبّر الخط / الخط صغير / رجّع الخط عادي / شغّل التباين / وقّف الزجاج\n• كتابة: اكتب في الاسم أحمد / رقمي صفر واحد… / الجهة مستشفى الأمل / محتاج مترجم إشارة / الحقل اللي بعده / امسح\n• تنفيذ: ابعت الطلب / احفظ / انشر / اضغط على (اسم الزر)\n• بحث: وريني البنوك / دوّر على مستشفى / قيّم الأولى خمس نجوم\n• قراءة: اقرا الصفحة / اسكت\n• مساعد: اسأل المساعد إزاي أطلب خدمة";
+var ORD={اولي:0,اول:0,تانيه:1,ثانيه:1,تالته:2,ثالثه:2,رابعه:3,خامسه:4,سادسه:5},STARS={نجمه:1,نجمتين:2,تلات:3,ثلاث:3,تلاته:3,ثلاثه:3,اربع:4,اربعه:4,خمس:5,خمسه:5};
+function vis(e){return e.offsetParent!==null&&!e.disabled}
+function pgEl(){return $(".page.on")}
+function flds(){var r=$$("input:not([type=checkbox]):not([type=hidden]),textarea,select",pgEl()).filter(vis);if(!$("#chat").hidden)r.unshift($("#ci"));return r}
+function lab(e){var l=e.id&&$('label[for="'+e.id+'"]');return norm((l?l.textContent:"")+" "+(e.placeholder||"")+" "+(e.getAttribute("aria-label")||""))}
+function setVal(e,v,app){if(e.tagName==="SELECT"){var o=[].slice.call(e.options).filter(function(x){var a=norm(x.textContent),b=norm(v);return a.indexOf(b)>-1||b.indexOf(a)>-1})[0];if(!o)return false;e.value=o.value||o.textContent}else e.value=(app&&e.value)?e.value+" "+v:v;e.dispatchEvent(new Event("input",{bubbles:true}));e.dispatchEvent(new Event("change",{bubbles:true}));return true}
+function fieldBy(word){word=norm(word).replace(/^ال/,"");var AL={تليفون:"هاتف",موبايل:"هاتف",رقم:"هاتف",طلب:"تجهيز",بحث:"بحث"};word=AL[word]||word;return flds().filter(function(e){return lab(e).indexOf(word)>-1})[0]}
+function goPage(k){if(location.hash!=="#"+k)location.hash="#"+k}
+function onPg(k){return (location.hash||"#home")==="#"+k}
+function tick(words,on){var done=false;$$("label",pgEl()).forEach(function(l){var c=$("input[type=checkbox]",l);if(!c||!vis(c))return;var tl=norm(l.textContent);if(words.split(/\s+/).some(function(x){return x.length>2&&tl.indexOf(norm(x))>-1})){c.checked=on;done=true}});return done}
+function submitIn(sel){var f=$(sel);if(f&&f.requestSubmit){f.requestSubmit();return true}return false}
+function clickBy(txt){var q=norm(txt).replace(/^(علي|ع|زر|ال)\s*/,"").trim();if(!q)return null;var c=$$("button,a.btn,a",document).filter(function(e){return vis(e)&&norm(e.textContent+" "+(e.getAttribute("aria-label")||"")).indexOf(q)>-1});var pg=c.filter(function(e){return pgEl().contains(e)})[0]||c[0];if(pg){pg.click();return "ضغطت على: "+(pg.textContent.trim().slice(0,30)||q)}return null}
+var UPW=["لفوق","فوق","ارفع","اعلي","لاعلي","للاعلي"],DNW=["لتحت","تحت","اسفل","لاسفل","للاسفل"];
+function runCmd(raw){raw=String(raw).trim();if(!raw)return null;var tk=raw.split(/\s+/),nt=tk.map(norm),st=0,FL=["يا","تمكين","لو","سمحت","من","فضلك","ممكن","عايز","عاوز","عايزه","نفسي","هل","تقدر","اعملي","اعمل","لي","ليا","انت","بقي","طيب","يلا"];
+ while(st<nt.length-1&&FL.indexOf(nt[st])>-1)st++;tk=tk.slice(st);nt=nt.slice(st);var t=nt.join(" ");
+ function h(){return [].slice.call(arguments).some(function(k){return t.indexOf(norm(k))>-1})}
+ function w(){return [].slice.call(arguments).some(function(k){return nt.indexOf(norm(k))>-1})}
+ function sw(){return [].slice.call(arguments).some(function(k){return nt.some(function(x){return x.indexOf(norm(k))===0})})}
+ function after(i){return tk.slice(i).join(" ")}
+ var off=sw("وقف","اقفل","الغ","اطف","شيل","بطل","عطل","ايقاف"),on=sw("شغل","فعل","ظهر");
+ if(h("وقف التحكم","ايقاف التحكم","بطل تحكم","اقفل التحكم","وقف الميكروفون")){setVoice(false);return "أوقفت التحكم الصوتي"}
+ var c0=nt[0];
+ if(["اكتب","اكتبلي","سجل","حط","دخل","ضيف"].indexOf(c0)>-1&&nt.length>1){var tgt,txt;
+  if((nt[1]==="في"||nt[1]==="ف")&&nt.length>3){tgt=fieldBy(tk[2]);txt=after(3)}if(!tgt){tgt=flds().filter(function(e){return e===document.activeElement})[0];txt=after(1);if(nt[1]==="في"||nt[1]==="ف")txt=after(2)}
+  if(!tgt)tgt=flds().filter(function(e){return e.tagName!=="SELECT"&&!e.value})[0]||flds()[0];
+  if(!tgt)return "مفيش حقل كتابة هنا";if(/هاتف/.test(lab(tgt)))txt=digits(txt);setVal(tgt,txt,tgt.tagName==="TEXTAREA");tgt.focus();return "كتبت: "+txt}
+ if(c0==="اسمي"||(c0==="الاسم"&&nt.length>1)){goPage(onPg("profile")?"profile":"request");var f=onPg("profile")?$("#pn"):$("#rn");setVal(f,after(1));return "الاسم: "+after(1)}
+ if(["رقمي","تليفوني","موبايلي","هاتفي"].indexOf(c0)>-1||(nt[0]==="رقم"&&nt.length>1)){var tx=digits(after(1));goPage(onPg("profile")?"profile":"request");setVal(onPg("profile")?$("#pp"):$("#rp"),tx);return "الرقم: "+tx}
+ if(c0==="الجهه"&&nt.length>1){goPage("request");setVal($("#re"),after(1));return "الجهة: "+after(1)}
+ if(h("حاله عاجله","طلب عاجل","عاجل")&&!h("اضغط")){goPage("request");$("#ru").checked=true;return "علّمت الطلب عاجل"}
+ if((c0==="محتاج"||c0==="التجهيز")&&nt.length>1){if(onPg("profile")){return tick(after(1),true)?"علّمت احتياجك":"مش لاقي الاحتياج ده في القائمة"}goPage("request");setVal($("#rd"),after(1),true);return "التجهيز: "+after(1)}
+ if(c0==="القطاع"||h("اختار القطاع","اختار قطاع")){var v=nt.slice(c0==="القطاع"?1:2).join(" ");var sel=$("#rc");goPage("request");if(setVal(sel,v))return "اخترت القطاع";return "مفهمتش القطاع"}
+ if(["علم","اختار","فعل","علمت"].indexOf(c0)>-1&&nt.length>1&&tick(after(1),true))return "تمام";
+ if(["الغ","شيل"].indexOf(c0)>-1&&nt.length>1&&tick(after(1),false))return "شلت العلامة";
+ if(c0==="اسال"||c0==="اسالي"){var q=after(1).replace(/^المساعد\s*/,"");chatOpen(true);sendChat(q||"مرحبا");return "سألت المساعد"}
+ if(h("قول للمساعد","كلم المساعد")){var q2=raw.replace(/^.*?المساعد\s*/,"");chatOpen(true);if(q2)sendChat(q2);return "المساعد"}
+ if(h("اقفل المساعد","اغلق المساعد","اقفل الشات")){chatOpen(false);return "أغلقت المساعد"}
+ if(h("افتح المساعد","المساعد","شات","ساعدني","مساعده")&&!h("الاوامر","اوامر")){chatOpen(true);return "فتحت المساعد"}
+ if(h("الاوامر","اوامر","اقول ايه","اعمل ايه")){chatOpen(true);addMsg("b",VH);return "عرضت الأوامر"}
+ if(h("وقف القراءه","اسكت","كفايه","بس كده")||(sw("وقف")&&w("القراءه","الصوت"))){stopR();return "أوقفت القراءة"}
+ if(sw("اقرا","اقرالي","اسمعني")){read();return "جاري القراءة"}
+ if(h("خط","الكلام","الحروف","الكتابه","الشاشه","حجم")){var big=sw("كبر","زود","اكبر","يكبر","يزيد")||h("زياده","اكبر شويه")||(w("صغير","صغيره","ضعيف")&&!sw("صغر")),sm=sw("صغر","قلل","انقص","اصغر","يصغر")||h("اقل")||(w("كبير","كبيره","ضخم")&&!sw("كبر"));
+  if(h("اقصي","اخر حجم","اكبر حجم","اكبر حاجه","اوي اوي")){S.size=160;apply();return "أقصى حجم للخط"}
+  if(h("عادي","الاصلي","الافتراضي","رجع","رجعه")){S.size=100;apply();return "رجّعت الخط عادي"}
+  if(big){S.size=Math.min(160,S.size+(h("شويه","شوي","بسيط")?10:20));apply();return "كبّرت الخط: "+S.size+"%"}
+  if(sm){S.size=Math.max(80,S.size-(h("شويه","شوي","بسيط")?10:20));apply();return "صغّرت الخط: "+S.size+"%"}}
+ var TG=[["hc","تباين","كونتراست","الوان واضحه"],["readable","خط واضح","خط سهل","خط مقروء"],["calm","هدوء","الحركه","انيميشن","حركات"],["noglass","زجاج","شفاف"],["spaced","تباعد","مسافات"],["ul","تسطير","خط تحت"],["ruler","مسطره"],["cur","مؤشر","ماوس","سهم كبير"]];
+ for(var i=0;i<TG.length;i++)if(h.apply(null,TG[i].slice(1))&&(off||on||sw("غير","بدل")||nt.length<=4)){var k=TG[i][0];S[k]=off?false:(on?true:!S[k]);apply();return (S[k]?"شغّلت":"وقّفت")+" "+TG[i][1]}
+ var up=sw("اطلع","طلعني")||nt.some(function(x){return UPW.indexOf(x)>-1}),dn=sw("انزل","نزلني","نزل")||nt.some(function(x){return DNW.indexOf(x)>-1});
+ if((up||dn)&&!h("افتح","وديني")){var end=w("خالص","اخر","لاخر","اخرها","نهايه","لنهايه","الاخر","اول","لاول","الاول","البدايه","البداية");
+  if(end){window.scrollTo({top:up?0:document.body.scrollHeight,behavior:"smooth"});return up?"لأول الصفحة":"لآخر الصفحة"}
+  var amt=w("شويه","شوي","حبه","حته","بسيط","بسيطه","سنه")||h("شويه بسيطه")?.25:(w("كتير","اوي","كبير","مرتين")?1.3:.65);window.scrollBy({top:(dn?1:-1)*amt*innerHeight,behavior:"smooth"});return dn?"نزلت":"طلعت"}
+ if(h("ارسل","ابعت","قدم","احفظ","انشر","سلم")&&nt.length<=5){var m=onPg("request")?"#rf":onPg("profile")?"#pf":onPg("emergency")?"#ef":onPg("community")?"#tf":(!$("#chat").hidden?"#cf":null);if(m&&submitIn(m))return "تمام";if(!m)return "مفيش حاجة تتبعت هنا"}
+ if(h("الحقل التالي","اللي بعده","التالي","بعده","الحقل اللي بعده")&&nt.length<=4){var fl=flds(),ix=fl.indexOf(document.activeElement);var n=fl[ix+1]||fl[0];if(n){n.focus();return "الحقل: "+lab(n).trim().slice(0,20)}}
+ if(h("الحقل السابق","اللي قبله","قبله")&&nt.length<=4){var f2=flds(),i2=f2.indexOf(document.activeElement);var pv=f2[i2-1]||f2[f2.length-1];if(pv){pv.focus();return "الحقل السابق"}}
+ if((c0==="امسح"||c0==="مسح")&&document.activeElement&&document.activeElement.value!==undefined){setVal(document.activeElement,"");return "مسحت الحقل"}
+ if(sw("روح","ركز","وقف")&&(w("حقل")||w("خانه"))&&nt.length>2){var fz=fieldBy(nt[nt.length-1]);if(fz){fz.focus();return "ركزت على الحقل"}}
+ var SECT=[["h","مستشف"],["g","حكوم","سجل","جوازات","جواز"],["b","بنك","بنوك"],["r","تاهيل","علاج طبيعي"]];
+ if(sw("وريني","اعرض","اشوف","هات","عرض")||h("كل الخدمات")){for(var j=0;j<SECT.length;j++)if(h.apply(null,SECT[j].slice(1))){goPage("services");showSvc(SECT[j][0]);return "عرضت خدمات "+SECT[j][1]}if(h("كل الخدمات")){goPage("services");showSvc("all");return "كل الخدمات"}}
+ if(sw("دور","ابحث","لاقي","دورلي")){var qq=nt.join(" "),KEY={sign:["اشاره"],braille:["برايل","ناطق"],ramp:["كرسي","ممر","ممرات"],comp:["مرافق"],desk:["شباك"],home:["منزلي","زياره"]},hit=null;for(var kk in KEY)if(h.apply(null,KEY[kk]))hit=kk;goPage("directory");if(hit){$("#ff").value=hit}else{var txt2=after(1).replace(/^(علي|عن)\s*/,"");$("#fq").value=txt2}renderDir();return hit?"فلترت حسب التجهيز":"بحثت في الدليل"}
+ if(h("امسح الفلتر","اظهر الكل","الغ الفلتر")){$("#fs").value="all";$("#ff").value="all";$("#fq").value="";renderDir();return "مسحت الفلاتر"}
+ if(sw("قيم","تقييم")){var num=0;nt.forEach(function(x){if(STARS[x])num=STARS[x];if(/^[1-5]$/.test(x))num=+x});var ci=0;nt.forEach(function(x){if(ORD[x]!==undefined)ci=ORD[x]});goPage("directory");renderDir();var cd=$$("#dl .card")[ci],stb=cd&&$$(".star",cd)[(num||5)-1];if(stb){stb.click();return "قيّمت "+(num||5)+" نجوم"}return "مش لاقي الجهة"}
+ if(h("اطلب من","اطلب خدمه هنا","اطلب هنا")&&(onPg("directory")||h("الجهه"))){var oi=0;nt.forEach(function(x){if(ORD[x]!==undefined)oi=ORD[x]});goPage("directory");var cd2=$$("#dl .card")[oi],bq=cd2&&$("[data-q]",cd2);if(bq){bq.click();return "فتحت طلب لهذه الجهة"}}
+ if(h("المجموعه")&&(sw("بعد","التالي","التاليه","التانيه","الجاي")||h("اللي بعدها"))){goPage("home");$("#gn").click();return "المجموعة التالية"}
+ if(h("المجموعه")&&(sw("قبل","السابق","السابقه","اللي فاتت")||h("اللي قبلها"))){goPage("home");$("#gp").click();return "المجموعة السابقة"}
+ if(h("انضم")){var jb=$(".dc[aria-hidden=false] a");if(jb){jb.click();return "فتحت المجتمع"}}
+ if(h("فيديو","الخلفيه")&&!$("#vpp").hidden){$("#vpp").click();return "الفيديو"}
+ if(h("القائمه")){menu(!off&&!h("اقفل"));return "القائمة"}
+ if(h("لوحه الوصول","لوحه سهوله","اعدادات سريعه")){$("#fb").click();return "لوحة سهولة الوصول"}
+ if(sw("ارجع","رجوع","الي الوراء")&&!h("للرئيسيه","للخدمات","للمجتمع","الرئيسيه")){history.back();return "رجعت"}
+ var NAV=[["emergency","طوارئ","اسعاف","نجده","كارت طبي","بطاقه طبيه"],["profile","ملفي","بروفايل","بياناتي","احتياجاتي"],["directory","دليل","الجهات"],["community","مجتمع","مجموعات","الجروب"],["access","سهوله","اعدادات"],["request","اطلب","طلب"],["services","خدمات","الخدمات"],["home","رئيسيه","الصفحه الاولي","الاساسيه","البدايه","تمكين"]];
+ for(var n2=0;n2<NAV.length;n2++)if(h.apply(null,NAV[n2].slice(1))&&(sw("افتح","وديني","روح","ارجع","خدني","انتقل","صفحه","اشوف","وريني")||nt.length<=3)){goPage(NAV[n2][0]);return "فتحت "+PN[NAV[n2][0]]}
+ if(sw("اضغط","دوس","كبس","اختار","افتح")&&nt.length>1){var cr=clickBy(after(1));if(cr)return cr}
+ if(!$("#chat").hidden&&nt.length>2){sendChat(raw);return "للمساعد: "+raw}
+ return null}
 /* routing */
 var firstR=true;if(document.startViewTransition)document.documentElement.classList.add("vt");
 function route(){var rm=matchMedia("(prefers-reduced-motion:reduce)").matches||document.body.classList.contains("calm");if(!firstR&&document.startViewTransition&&!rm){document.startViewTransition(route0)}else route0();firstR=false}
