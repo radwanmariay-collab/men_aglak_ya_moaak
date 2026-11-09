@@ -250,6 +250,10 @@ body:not(.hc):not(.noglass) .chat{background:linear-gradient(160deg,var(--gl),va
 #vtoast{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:120;max-width:90vw;padding:.7rem 1.3rem;border-radius:9rem;color:#fff;font-weight:700;background:linear-gradient(135deg,rgba(10,31,17,.85),rgba(10,31,17,.65));border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .4s,transform .6s cubic-bezier(.34,1.45,.64,1)}
 #vtoast.on{opacity:1;transform:translate(-50%,0)}
 body.bignav nav.d ul{display:none!important}body.bignav .burger{display:grid!important}
+li.ind{transition:transform 1.2s cubic-bezier(.16,1,.3,1),width 1.2s cubic-bezier(.16,1,.3,1),height 1.2s cubic-bezier(.16,1,.3,1),opacity .5s}
+nav.d a{transition:color .8s}
+.chat .deep{font-size:.78rem;font-weight:600;display:flex;gap:.3rem;align-items:center;margin-inline-start:auto;margin-inline-end:.6rem}
+.cnote{font-size:.78rem;color:var(--soft);padding:0 1rem .5rem;margin:0}
 </style>
 </head>
 <body>
@@ -381,8 +385,9 @@ body.bignav nav.d ul{display:none!important}body.bignav .burger{display:grid!imp
  <button class="orb main" id="fb" aria-label="أدوات سهولة الوصول" aria-expanded="false" aria-controls="panel"><span>♿</span></button>
 </div>
 <section class="chat" id="chat" role="dialog" aria-label="مساعد تمكين" hidden>
- <header><div>🤖 مساعد تمكين<small id="cs">مساعد مبسّط</small></div><button id="cx" aria-label="إغلاق المساعد">✕</button></header>
+ <header><div>🤖 مساعد تمكين<small id="cs">مساعد مبسّط</small></div><label class="deep"><input type="checkbox" id="cdeep"> تفكير أعمق</label><button id="cx" aria-label="إغلاق المساعد">✕</button></header>
  <div class="cm" id="cm" role="log" aria-live="polite"></div><div class="chips" id="cchips"></div>
+ <p class="cnote">⚠ المساعد الذكي بيبعت كلامك لخدمة Google Gemini. متكتبش بيانات حساسة حقيقية.</p>
  <form id="cf" autocomplete="off"><input class="fi" id="ci" aria-label="اكتب سؤالك" placeholder="اسأل عن الخدمات أو اطلب صفحة…"><button class="orb mic" type="button" id="cmic" aria-label="تحدث بدل الكتابة">🎤</button><button class="btn br" type="submit">إرسال</button></form>
 </section>
 <div id="vtoast" role="status" aria-live="polite"></div>
@@ -672,6 +677,87 @@ function runCmd(raw){raw=String(raw).trim();if(!raw)return null;var tk=raw.split
  if(sw("اضغط","دوس","كبس","اختار","افتح")&&nt.length>1){var cr=clickBy(after(1));if(cr)return cr}
  if(!$("#chat").hidden&&nt.length>2){sendChat(raw);return "للمساعد: "+raw}
  return null}
+/* v10 AI agent */
+/* ضع هنا رابط الـ Worker بعد نشره، مثال: "https://tamkeen-agent.yourname.workers.dev" */
+var CONFIG={endpoint:"https://tamkeen.radwanradwanradwa55n.workers.dev"};
+var _sm,ctl=null,chatBusy=false,permAsked=false,vMute=false,vBusy=false,vQ=null;
+async function getSample(){if(_sm!==undefined)return _sm;if(!(window.claude&&claude.use)){_sm=null;return null}try{_sm=await claude.use("sample")}catch(e){_sm=null}return _sm}
+function askPerm(){if(permAsked)return;permAsked=true;try{claude.use("permissions").then(function(p){if(p)return p.request(["sample"])}).catch(function(){})}catch(e){}}
+var _co=chatOpen;chatOpen=function(o){_co(o);if(o)askPerm()};
+function siteState(){var pg=(location.hash||"#home").slice(1);
+ var o={page:pg,fields:flds().map(function(e){return{label:lab(e).trim().slice(0,30),type:e.tagName==="SELECT"?"select":e.type,value:(e.value||"").slice(0,40)}}),
+ checkboxes:$$("label",pgEl()).filter(function(l){var c=$("input[type=checkbox]",l);return c&&vis(c)}).map(function(l){return{label:l.textContent.trim().slice(0,30),checked:$("input",l).checked}}),
+ buttons:$$("button,a.btn",pgEl()).filter(vis).map(function(b){return b.textContent.trim().slice(0,22)}).filter(Boolean).slice(0,14),
+ fontPercent:S.size,options:{hc:!!S.hc,readable:!!S.readable,calm:!!S.calm,noglass:!!S.noglass,spaced:!!S.spaced,ul:!!S.ul,ruler:!!S.ruler,cur:!!S.cur},chatOpen:!$("#chat").hidden};
+ if(pg==="directory")o.cards=$$("#dl .card h3").map(function(h,i){return i+": "+h.textContent});
+ return JSON.stringify(o).slice(0,3000)}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+async function goWait(k){if((location.hash||"#home")!=="#"+k)location.hash="#"+k;for(var i=0;i<40;i++){var p=$("#p-"+k);if(p&&p.classList.contains("on")&&p.offsetParent!==null)break;await sleep(60)}await sleep(80)}
+function fieldByLabel(label){var L=norm(label||"").replace(/^ال/,"").trim(),AL={تليفون:"هاتف",موبايل:"هاتف",رقم:"هاتف",طلب:"تجهيز",تجهيزات:"تجهيز",بحث:"بحث",اسم:"اسم"};L=AL[L]||L;var f=flds();return f.filter(function(e){return lab(e).indexOf(L)>-1})[0]||(f.length===1?f[0]:null)}
+async function doAct(a){var T=a.type;
+ if(T==="navigate"){if(!PN[a.page])throw new Error("unknown page "+a.page);await goWait(a.page);return "opened "+a.page}
+ if(T==="back"){history.back();await sleep(500);return "back"}
+ if(T==="scroll"){var up=a.direction==="up",amt={small:.25,medium:.65,large:1.3}[a.amount]||.65;if(a.amount==="end"){window.scrollTo({top:up?0:document.body.scrollHeight,behavior:"smooth"});return up?"top":"bottom"}window.scrollBy({top:(up?-1:1)*amt*innerHeight,behavior:"smooth"});return "scrolled "+a.direction}
+ if(T==="font"){var st=(+a.steps||1)*10;if(a.op==="reset")S.size=100;else if(a.op==="max")S.size=160;else if(a.op==="increase")S.size=Math.min(160,S.size+st);else if(a.op==="decrease")S.size=Math.max(80,S.size-st);apply();return "font "+S.size+"%"}
+ if(T==="toggle"){var k=a.option;if(["hc","readable","calm","noglass","spaced","ul","ruler","cur"].indexOf(k)<0)throw new Error("unknown option");S[k]=(a.enabled===undefined||a.enabled===null)?!S[k]:!!a.enabled;apply();return k+"="+S[k]}
+ if(T==="fill"){var f=fieldByLabel(a.label);if(!f)throw new Error("field not found: "+a.label+". available: "+flds().map(function(e){return lab(e).trim()}).join(" | "));var v=String(a.value==null?"":a.value);if(f.type==="tel"||/هاتف/.test(lab(f)))v=digits(v)||v;if(!setVal(f,v,a.append&&f.tagName==="TEXTAREA"))throw new Error("could not set value");f.focus();return "filled "+lab(f).trim().slice(0,24)}
+ if(T==="select"){var sf=fieldByLabel(a.label);if(!sf||sf.tagName!=="SELECT")throw new Error("select not found");if(!setVal(sf,String(a.value)))throw new Error("option not found: "+[].slice.call(sf.options).map(function(o){return o.textContent}).join(" | "));return "selected"}
+ if(T==="check"){if(!tick(String(a.label),a.checked!==false))throw new Error("checkbox not found");return "checked "+a.label}
+ if(T==="submit"){var m=onPg("request")?"#rf":onPg("profile")?"#pf":onPg("emergency")?"#ef":onPg("community")?"#tf":(!$("#chat").hidden?"#cf":null);if(!m||!submitIn(m))throw new Error("no form to submit on this page");return "submitted"}
+ if(T==="click"){var r=clickBy(String(a.text));if(!r)throw new Error("no visible button/link matches: "+a.text);return r}
+ if(T==="services_filter"){await goWait("services");showSvc(["all","h","g","b","r"].indexOf(a.sector)>-1?a.sector:"all");return "services "+a.sector}
+ if(T==="directory"){await goWait("directory");if(a.reset){$("#fs").value="all";$("#ff").value="all";$("#fq").value=""}if(a.sector)$("#fs").value=a.sector;if(a.feature)$("#ff").value=a.feature==="any"?"all":a.feature;if(a.query!=null)$("#fq").value=String(a.query);renderDir();return "directory: "+$$("#dl .card h3").map(function(h,i){return i+":"+h.textContent}).join(" | ")}
+ if(T==="rate"){await goWait("directory");var c=$$("#dl .card")[+a.index||0],b=c&&$$(".star",c)[Math.min(5,Math.max(1,+a.stars||5))-1];if(!b)throw new Error("card not found");b.click();return "rated"}
+ if(T==="request_from"){await goWait("directory");var c2=$$("#dl .card")[+a.index||0],q=c2&&$("[data-q]",c2);if(!q)throw new Error("card not found");q.click();await sleep(300);await goWait("request");return "request page prefilled with entity"}
+ if(T==="read"){if(a.op==="stop")stopR();else{await sleep(50);read()}return "read "+a.op}
+ if(T==="carousel"){await goWait("home");$(a.direction==="prev"?"#gp":"#gn").click();return "carousel "+a.direction}
+ if(T==="video"){if($("#vpp").hidden)throw new Error("no background video loaded");$("#vpp").click();return "video toggled"}
+ if(T==="menu"){menu(a.open!==false);return "menu"}
+ if(T==="assistant"){chatOpen(a.open!==false);return "assistant"}
+ if(T==="stop_voice"){setTimeout(function(){setVoice(false)},300);return "voice will stop"}
+ throw new Error("unknown action type "+T)}
+var ACT={name:"act",description:"Perform actions on the website in order, then return one result per action plus the new page state. Put ALL needed actions in one call, in order. actions[].type: navigate{page}, back, scroll{direction,amount}, font{op,steps}, toggle{option,enabled}, fill{label,value,append}, select{label,value}, check{label,checked}, submit, click{text}, services_filter{sector}, directory{query,feature,sector,reset}, rate{index,stars}, request_from{index}, read{op}, carousel{direction}, video, menu{open}, assistant{open}, stop_voice.",
+ inputSchema:{type:"object",properties:{actions:{type:"array",items:{type:"object",properties:{type:{type:"string"},page:{type:"string",enum:["home","services","directory","community","profile","emergency","access","request"]},direction:{type:"string",enum:["up","down","next","prev"]},amount:{type:"string",enum:["small","medium","large","end"]},op:{type:"string",enum:["increase","decrease","reset","max","start","stop"]},steps:{type:"number"},option:{type:"string",enum:["hc","readable","calm","noglass","spaced","ul","ruler","cur"]},enabled:{type:"boolean"},label:{type:"string"},value:{type:"string"},append:{type:"boolean"},checked:{type:"boolean"},text:{type:"string"},sector:{type:"string",enum:["all","h","g","b","r"]},query:{type:"string"},feature:{type:"string",enum:["any","ramp","sign","braille","comp","desk","home"]},reset:{type:"boolean"},index:{type:"number"},stars:{type:"number"},open:{type:"boolean"}},required:["type"]}}},required:["actions"]},
+ execute:async function(inp){var out=[];var L=(inp&&inp.actions)||[];for(var i=0;i<L.length;i++){try{out.push(await doAct(L[i]))}catch(e){out.push("ERROR: "+((e&&e.message)||e))}}return{results:out,state:siteState()}}};
+function SYS(){return "أنت «مساعد تمكين»، وكيل ذكاء اصطناعي (AI agent) داخل موقع تمكين. مهمتك الأولى: تنفّذ بنفسك ما يطلبه المستخدم على الموقع (تنقل، تمرير، تكبير الخط، إعدادات سهولة الوصول، تعبئة النماذج، ضغط الأزرار، البحث والتقييم… إلخ) باستخدام الأداة act، وتضع كل الإجراءات المطلوبة بالترتيب في استدعاء واحد. المستخدم يتكلم بالعامية المصرية، وقد يكون التعرف الصوتي أخطأ في بعض الكلمات، فاستنتج المقصود من السياق ولا تسأل إلا لو كان الأمر غامضاً فعلاً. مهمتك الثانية: أجب عن أي سؤال؛ أسئلة الموقع من معلوماته أدناه، والأسئلة العامة خارج الموقع بمعرفتك وتفكيرك بوضوح وإيجاز، مع ربطها بالموقع حين يفيد.\nقواعد: (1) لا ترسل أي نموذج (submit) إلا إذا قال المستخدم صراحة ابعت/ارسل/احفظ/انشر. (2) اكتب في الحقول ما قاله المستخدم فقط ولا تخترع بيانات شخصية، وحوّل الأرقام المنطوقة إلى أرقام. (3) أنت لا ترى الشاشة، فاعتمد على «حالة الصفحة» المرفقة ونتائج act، واستخدم أسماء الحقول كما تظهر فيها؛ وإن كان الطلب في صفحة أخرى فابدأ بـ navigate. (4) إن فشل إجراء فجرّب بديلاً قريباً قبل أن تعتذر. (5) الموقع نسخة تجريبية والطلبات لا تصل لأي جهة حقيقية؛ اذكر ذلك لو سُئلت أو قبل أن يعتمد المستخدم عليه. (6) في الطوارئ الطبية انصح بالاتصال بالإسعاف 123؛ لا تقدّم تشخيصاً طبياً ولا استشارة قانونية ملزمة. (7) الرد بالعامية المصرية المبسطة وقصير جداً (جملة أو اثنتان)، وبعد التنفيذ أكّد باختصار ما تم.\nمعلومات الموقع:\n"+kbText()}
+function errCopy(e){var c=e&&e.code;return c==="rate_limited"?"الذكاء الاصطناعي مشغول، جرّب بعد شوية.":c==="not_granted"?"لازم تسمح للموقع باستخدام Claude عشان الوكيل الذكي يشتغل.":"حصلت مشكلة مؤقتة في الوكيل الذكي."}
+async function endpointAsk(text,via,onText){var msgs=[],h2=hist.slice(-8);while(h2.length&&h2[0].r!=="u")h2.shift();h2.forEach(function(m){msgs.push({role:m.r==="u"?"user":"assistant",content:m.t})});
+ msgs.push({role:"user",content:"[حالة الصفحة] "+siteState()+"\n[القناة] "+via+"\n[طلب المستخدم] "+text});
+ var tools=[{name:ACT.name,description:ACT.description,input_schema:ACT.inputSchema}],out="";
+ for(var i=0;i<6;i++){var res=await fetch(CONFIG.endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system:SYS(),messages:msgs,tools:tools})});if(!res.ok)throw{code:"upstream_error"};var j=await res.json();
+  var tx=(j.content||[]).filter(function(c){return c.type==="text"}).map(function(c){return c.text}).join("\n");if(tx){out+=(out?"\n\n":"")+tx;if(onText)onText(clean(out))}
+  var tu=(j.content||[]).filter(function(c){return c.type==="tool_use"});if(j.stop_reason!=="tool_use"||!tu.length)break;
+  msgs.push({role:"assistant",content:j.content});var rs=[];for(var k=0;k<tu.length;k++){var rr;try{rr=JSON.stringify(await ACT.execute(tu[k].input))}catch(e){rr="Error: "+((e&&e.message)||e)}rs.push({type:"tool_result",tool_use_id:tu[k].id,content:rr})}msgs.push({role:"user",content:rs})}
+ hist.push({r:"u",t:text},{r:"b",t:clean(out)});return{text:out||"تمام"}}
+async function agentAsk(text,via,onText){if(aiOff)return null;if(CONFIG.endpoint)return endpointAsk(text,via,onText);
+ var sm=await getSample();if(!sm)return null;var lim=await sm.limits().catch(function(){return{}}),tools=lim.tools?[ACT]:null;if(!tools&&via==="voice")return null;
+ var deep=via==="chat"&&$("#cdeep")&&$("#cdeep").checked;
+ var turns=[{role:"user",content:SYS()}];hist.slice(-8).forEach(function(m){turns.push({role:m.r==="u"?"user":"assistant",content:m.t})});
+ turns.push({role:"user",content:"[حالة الصفحة] "+siteState()+"\n[القناة] "+(via==="voice"?"صوت":"كتابة")+"\n[طلب المستخدم] "+text});
+ ctl=new AbortController();var opt={cache:false,signal:ctl.signal,modelTier:deep?"default":"quick"};if(tools)opt.tools=tools;if(onText)opt.onText=function(x){onText(clean(x.text))};
+ try{var r=await sm(turns,opt);hist.push({r:"u",t:text},{r:"b",t:clean(r.text)});return r}catch(e){if(e&&e.code==="not_granted")aiOff=true;throw e}finally{ctl=null}}
+function setSend(b){var x=$("#cf button[type=submit]");if(x)x.textContent=b?"إيقاف":"إرسال"}
+async function sendChat(q){q=q.trim();if(!q||chatBusy)return;addMsg("u",q);$("#ci").value="";var b=addMsg("b","🤔 بفكر…");chatBusy=true;setSend(true);var done=false;
+ try{var r=await agentAsk(q,"chat",function(t){if(t)b.textContent=t});if(r&&r.text){b.textContent=clean(r.text)||"تمام";$("#cs").textContent="🧠 وكيل ذكاء اصطناعي";done=true}}
+ catch(e){if(e&&e.code==="cancelled"){b.textContent=((e.text&&clean(e.text))||"")+" (تم الإيقاف)";done=true}else if(e&&e.code){b.textContent=errCopy(e);done=aiOff?false:true}}
+ if(!done){var a=localAnswer(q);b.textContent=a.text;hist.push({r:"u",t:q},{r:"b",t:a.text});$("#cs").textContent="وضع مبسّط (بدون ذكاء اصطناعي)";if(a.go)goPage(a.go)}
+ chatBusy=false;setSend(false);$("#cm").scrollTop=1e5}
+$("#cf").addEventListener("submit",function(e){if(chatBusy&&ctl){e.stopImmediatePropagation();e.preventDefault();ctl.abort()}},true);
+/* v10 voice -> agent */
+function speak(t){if(!("speechSynthesis" in window)||!vOn)return;try{vMute=true;rec&&rec.stop()}catch(x){}speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="ar-EG";u.onend=u.onerror=function(){vMute=false;if(vOn){try{rec.start()}catch(x){}}};speechSynthesis.speak(u)}
+async function handleVoice(x){x=String(x).trim();if(!x)return;if(vBusy){vQ=x;return}vBusy=true;toast("🎤 "+x+"  ⏳");
+ try{var r=await agentAsk(x,"voice");if(r&&r.text){var t=clean(r.text);toast("🤖 "+t.slice(0,160));addMsg("u","🎤 "+x);addMsg("b",t);speak(t.slice(0,220))}else{var m=runCmd(x);toast("🎤 "+x+(m?" ← "+m:" (لم أفهم الأمر)"))}}
+ catch(e){var m2=runCmd(x);toast(m2?"🎤 "+x+" ← "+m2:"⚠ "+errCopy(e))}
+ vBusy=false;if(vQ){var n=vQ;vQ=null;handleVoice(n)}}
+function setVoice(on){if(!SR){toast("متصفحك لا يدعم الأوامر الصوتية. جرّب Chrome.");return}
+ vOn=on;$("#vc").setAttribute("aria-pressed",on);
+ if(on){askPerm();rec=mkRec("ar-EG",true);
+  rec.onresult=function(e){handleVoice(e.results[e.results.length-1][0].transcript)};
+  rec.onerror=function(e){if(e.error==="not-allowed"||e.error==="service-not-allowed"){vOn=false;$("#vc").setAttribute("aria-pressed","false");toast("المتصفح منع الميكروفون. اسمح له من إعدادات الموقع.")}};
+  rec.onend=function(){if(vOn&&!vMute){try{rec.start()}catch(x){}}};
+  try{rec.start();toast("🎤 بسمعك… كلمني عادي بالعامية")}catch(x){}}
+ else{vMute=false;try{rec&&rec.stop()}catch(x){}if("speechSynthesis" in window)speechSynthesis.cancel();toast("تم إيقاف التحكم الصوتي")}}
+$("#cmic").onclick=function(){if(!SR){toast("متصفحك لا يدعم الإدخال الصوتي. جرّب Chrome.");return}askPerm();var r=mkRec("ar-EG",false);r.onresult=function(e){sendChat(e.results[0][0].transcript)};r.onerror=function(){toast("تعذّر الوصول للميكروفون")};try{r.start();toast("🎤 تحدّث الآن…")}catch(x){}};
 /* routing */
 var firstR=true;if(document.startViewTransition)document.documentElement.classList.add("vt");
 function route(){var rm=matchMedia("(prefers-reduced-motion:reduce)").matches||document.body.classList.contains("calm");if(!firstR&&document.startViewTransition&&!rm){document.startViewTransition(route0)}else route0();firstR=false}
