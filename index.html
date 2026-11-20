@@ -387,7 +387,7 @@ nav.d a{transition:color .8s}
 <section class="chat" id="chat" role="dialog" aria-label="مساعد تمكين" hidden>
  <header><div>🤖 مساعد تمكين<small id="cs">مساعد مبسّط</small></div><label class="deep"><input type="checkbox" id="cdeep"> تفكير أعمق</label><button id="cx" aria-label="إغلاق المساعد">✕</button></header>
  <div class="cm" id="cm" role="log" aria-live="polite"></div><div class="chips" id="cchips"></div>
- <p class="cnote">⚠ المساعد الذكي بيبعت كلامك لخدمة Google Gemini. متكتبش بيانات حساسة حقيقية.</p>
+ <p class="cnote">⚠ المساعد الذكي بيبعت كلامك لخدمة Groq. متكتبش بيانات حساسة حقيقية.</p>
  <form id="cf" autocomplete="off"><input class="fi" id="ci" aria-label="اكتب سؤالك" placeholder="اسأل عن الخدمات أو اطلب صفحة…"><button class="orb mic" type="button" id="cmic" aria-label="تحدث بدل الكتابة">🎤</button><button class="btn br" type="submit">إرسال</button></form>
 </section>
 <div id="vtoast" role="status" aria-live="polite"></div>
@@ -451,8 +451,18 @@ $("#bg").onclick=function(){menu(true);$("#mc").focus()};$("#mc").onclick=functi
 var S={size:100,hc:false,readable:false,calm:false,spaced:false,ul:false,ruler:false,cur:false};
 try{var sv=JSON.parse(localStorage.getItem("tamkeen_a11y")||"null");if(sv)S=Object.assign(S,sv)}catch(e){}
 function apply(){document.documentElement.style.fontSize=(16*S.size/100)+"px";["hc","readable","calm","spaced","ul","ruler","cur","noglass"].forEach(function(k){document.body.classList.toggle(k,!!S[k]);$$('[data-t="'+k+'"]').forEach(function(b){b.setAttribute("aria-pressed",S[k]);if(b.classList.contains("alt"))b.textContent=S[k]?"مفعّل":"إيقاف"})});$("#sv").textContent=S.size;try{localStorage.setItem("tamkeen_a11y",JSON.stringify(S))}catch(e){}}
-function stopR(){if("speechSynthesis" in window)speechSynthesis.cancel()}
-function read(){if(!("speechSynthesis" in window)){alert("متصفحك لا يدعم القراءة الصوتية");return}stopR();var u=new SpeechSynthesisUtterance($(".page.on").innerText);u.lang="ar-EG";speechSynthesis.speak(u)}
+var _voice=null;function pickVoice(){var vs=speechSynthesis.getVoices();var ar=vs.filter(function(v){return/^ar/i.test(v.lang)});if(!ar.length)return null;function sc(v){var n=v.name.toLowerCase(),x=0;if(/^ar[-_]eg/i.test(v.lang))x+=5;if(/natural|neural|online/.test(n))x+=10;if(/google/.test(n))x+=3;if(/salma|shakir|hoda|laila|zariyah/.test(n))x+=2;if(v.localService===false)x+=1;return x}ar.sort(function(a,b){return sc(b)-sc(a)});return ar[0]}function mkU(t){var u=new SpeechSynthesisUtterance(t);u.lang="ar-EG";try{var v=_voice||(_voice=pickVoice());if(v){u.voice=v;u.lang=v.lang}}catch(e){}u.rate=0.95;u.pitch=1;return u}if("speechSynthesis" in window)speechSynthesis.onvoiceschanged=function(){_voice=null}; var _ta=null,_tq=0;function ttsStop(){_tq++;try{_ta&&_ta.pause()}catch(e){}_ta=null}
+function ttsChunks(t){t=String(t).replace(/\s+/g," ").trim();var out=[],cur="";(t.match(/[^.!؟?،۔]+[.!؟?،۔]*\s*/g)||[t]).forEach(function(p){if(cur&&(cur+p).length>450){out.push(cur);cur=""}cur+=p;while(cur.length>600){out.push(cur.slice(0,600));cur=cur.slice(600)}});if(cur.trim())out.push(cur);return out.slice(0,40)}
+async function cloudSpeak(text,done){var ep=(typeof CONFIG!=="undefined"&&CONFIG.endpoint)||"";if(!ep)return false;var chunks=ttsChunks(text);if(!chunks.length)return false;
+function get(i){return fetch(ep.replace(/\/+$/,"")+"/tts",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text:chunks[i]})}).then(function(r){if(!r.ok)throw new Error(r.status);return r.blob()}).then(function(b){return URL.createObjectURL(b)})}
+var id=++_tq,first;try{first=await get(0)}catch(e){return false}
+if(id!==_tq)return true;
+(async function(){var cur=first;for(var i=0;i<chunks.length;i++){if(id!==_tq)return;var nxt=i+1<chunks.length?get(i+1).catch(function(){return null}):null;
+await new Promise(function(res){var a=new Audio(cur);_ta=a;var u=cur;a.onended=a.onerror=function(){URL.revokeObjectURL(u);res()};a.play().catch(res)});
+if(id!==_tq)return;cur=nxt?await nxt:null;if(!cur)break}
+if(id===_tq&&done)done()})();return true}
+function stopR(){ttsStop();if("speechSynthesis" in window)speechSynthesis.cancel()}
+function read(){stopR();var txt=$(".page.on").innerText;cloudSpeak(txt).then(function(ok){if(ok)return;if(!("speechSynthesis" in window)){alert("متصفحك لا يدعم القراءة الصوتية");return}speechSynthesis.speak(mkU(txt))})}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-a],[data-t]");if(!b)return;if(b.dataset.t)S[b.dataset.t]=!S[b.dataset.t];else{var a=b.dataset.a;if(a==="bigger")S.size=Math.min(160,S.size+10);if(a==="smaller")S.size=Math.max(80,S.size-10);if(a==="reset")S={size:100,hc:false,readable:false,calm:false};if(a==="read")read();if(a==="stop")stopR()}apply()});
 $("#fb").onclick=function(){var o=$("#panel").classList.toggle("open");this.setAttribute("aria-expanded",o)};
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){menu(false);$("#panel").classList.remove("open");$("#fb").setAttribute("aria-expanded","false")}});
@@ -721,10 +731,10 @@ var ACT={name:"act",description:"Perform actions on the website in order, then r
  execute:async function(inp){var out=[];var L=(inp&&inp.actions)||[];for(var i=0;i<L.length;i++){try{out.push(await doAct(L[i]))}catch(e){out.push("ERROR: "+((e&&e.message)||e))}}return{results:out,state:siteState()}}};
 function SYS(){return "أنت «مساعد تمكين»، وكيل ذكاء اصطناعي (AI agent) داخل موقع تمكين. مهمتك الأولى: تنفّذ بنفسك ما يطلبه المستخدم على الموقع (تنقل، تمرير، تكبير الخط، إعدادات سهولة الوصول، تعبئة النماذج، ضغط الأزرار، البحث والتقييم… إلخ) باستخدام الأداة act، وتضع كل الإجراءات المطلوبة بالترتيب في استدعاء واحد. المستخدم يتكلم بالعامية المصرية، وقد يكون التعرف الصوتي أخطأ في بعض الكلمات، فاستنتج المقصود من السياق ولا تسأل إلا لو كان الأمر غامضاً فعلاً. مهمتك الثانية: أجب عن أي سؤال؛ أسئلة الموقع من معلوماته أدناه، والأسئلة العامة خارج الموقع بمعرفتك وتفكيرك بوضوح وإيجاز، مع ربطها بالموقع حين يفيد.\nقواعد: (1) لا ترسل أي نموذج (submit) إلا إذا قال المستخدم صراحة ابعت/ارسل/احفظ/انشر. (2) اكتب في الحقول ما قاله المستخدم فقط ولا تخترع بيانات شخصية، وحوّل الأرقام المنطوقة إلى أرقام. (3) أنت لا ترى الشاشة، فاعتمد على «حالة الصفحة» المرفقة ونتائج act، واستخدم أسماء الحقول كما تظهر فيها؛ وإن كان الطلب في صفحة أخرى فابدأ بـ navigate. (4) إن فشل إجراء فجرّب بديلاً قريباً قبل أن تعتذر. (5) الموقع نسخة تجريبية والطلبات لا تصل لأي جهة حقيقية؛ اذكر ذلك لو سُئلت أو قبل أن يعتمد المستخدم عليه. (6) في الطوارئ الطبية انصح بالاتصال بالإسعاف 123؛ لا تقدّم تشخيصاً طبياً ولا استشارة قانونية ملزمة. (7) الرد بالعامية المصرية المبسطة وقصير جداً (جملة أو اثنتان)، وبعد التنفيذ أكّد باختصار ما تم.\nمعلومات الموقع:\n"+kbText()}
 function errCopy(e){var c=e&&e.code;return c==="rate_limited"?"الذكاء الاصطناعي مشغول، جرّب بعد شوية.":c==="not_granted"?"لازم تسمح للموقع باستخدام Claude عشان الوكيل الذكي يشتغل.":"حصلت مشكلة مؤقتة في الوكيل الذكي."+(e&&e.status?" [خطأ "+e.status+(e.detail?": "+e.detail:"")+"]":"")}
-async function endpointAsk(text,via,onText){var msgs=[],h2=hist.slice(-8);while(h2.length&&h2[0].r!=="u")h2.shift();h2.forEach(function(m){msgs.push({role:m.r==="u"?"user":"assistant",content:m.t})});
+async function endpointAsk(text,via,onText){var msgs=[],h2=hist.slice(-4);while(h2.length&&h2[0].r!=="u")h2.shift();h2.forEach(function(m){msgs.push({role:m.r==="u"?"user":"assistant",content:m.t})});
  msgs.push({role:"user",content:"[حالة الصفحة] "+siteState()+"\n[القناة] "+via+"\n[طلب المستخدم] "+text});
  var tools=[{name:ACT.name,description:ACT.description,input_schema:ACT.inputSchema}],out="";
- for(var i=0;i<6;i++){var res=await fetch(CONFIG.endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system:SYS(),messages:msgs,tools:tools})});if(!res.ok){var et="";try{et=(await res.text()).slice(0,200)}catch(_){}throw{code:"upstream_error",status:res.status,detail:et}};var j=await res.json();
+ for(var i=0;i<4;i++){var res=await fetch(CONFIG.endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system:SYS(),messages:msgs,tools:tools})});if(!res.ok){var et="";try{et=(await res.text()).slice(0,200)}catch(_){}throw{code:"upstream_error",status:res.status,detail:et}};var j=await res.json();
   var tx=(j.content||[]).filter(function(c){return c.type==="text"}).map(function(c){return c.text}).join("\n");if(tx){out+=(out?"\n\n":"")+tx;if(onText)onText(clean(out))}
   var tu=(j.content||[]).filter(function(c){return c.type==="tool_use"});if(j.stop_reason!=="tool_use"||!tu.length)break;
   msgs.push({role:"assistant",content:j.content});var rs=[];for(var k=0;k<tu.length;k++){var rr;try{rr=JSON.stringify(await ACT.execute(tu[k].input))}catch(e){rr="Error: "+((e&&e.message)||e)}rs.push({type:"tool_result",tool_use_id:tu[k].id,content:rr})}msgs.push({role:"user",content:rs})}
@@ -738,14 +748,14 @@ async function agentAsk(text,via,onText){if(aiOff)return null;if(CONFIG.endpoint
  try{var r=await sm(turns,opt);hist.push({r:"u",t:text},{r:"b",t:clean(r.text)});return r}catch(e){if(e&&e.code==="not_granted")aiOff=true;throw e}finally{ctl=null}}
 function setSend(b){var x=$("#cf button[type=submit]");if(x)x.textContent=b?"إيقاف":"إرسال"}
 async function sendChat(q){q=q.trim();if(!q||chatBusy)return;addMsg("u",q);$("#ci").value="";var b=addMsg("b","🤔 بفكر…");chatBusy=true;setSend(true);var done=false;
- try{var r=await agentAsk(q,"chat",function(t){if(t)b.textContent=t});if(r&&r.text){b.textContent=clean(r.text)||"تمام";$("#cs").textContent="🧠 وكيل ذكاء اصطناعي";done=true}}
- catch(e){if(e&&e.code==="cancelled"){b.textContent=((e.text&&clean(e.text))||"")+" (تم الإيقاف)";done=true}else if(e&&e.code){b.textContent=errCopy(e);done=aiOff?false:true}}
- if(!done){var a=localAnswer(q);b.textContent=a.text;hist.push({r:"u",t:q},{r:"b",t:a.text});$("#cs").textContent="وضع مبسّط (بدون ذكاء اصطناعي)";if(a.go)goPage(a.go)}
+ var chipHit=[].slice.call($$("#cchips button")).some(function(c){return c.textContent.trim()===q});try{var r=chipHit?null:await agentAsk(q,"chat",function(t){if(t)b.textContent=t});if(r&&r.text){b.textContent=clean(r.text)||"تمام";$("#cs").textContent="🧠 وكيل ذكاء اصطناعي";done=true}}
+ catch(e){if(e&&e.code==="cancelled"){b.textContent=((e.text&&clean(e.text))||"")+" (تم الإيقاف)";done=true}else if(e&&e.code){b.textContent=errCopy(e);done=aiOff?false:true}else{b.textContent="تعذّر الاتصال بالوكيل: "+((e&&e.message)||e)+" — غالباً ALLOW_ORIGIN أو رابط الـ Worker غلط.";done=true}}
+ if(!done){var a=localAnswer(q);b.textContent=a.text;hist.push({r:"u",t:q},{r:"b",t:a.text});$("#cs").textContent=chipHit?"⚡ رد سريع":"وضع مبسّط (بدون ذكاء اصطناعي)";if(a.go)goPage(a.go)}
  chatBusy=false;setSend(false);$("#cm").scrollTop=1e5}
 $("#cf").addEventListener("submit",function(e){if(chatBusy&&ctl){e.stopImmediatePropagation();e.preventDefault();ctl.abort()}},true);
 /* v10 voice -> agent */
-function speak(t){if(!("speechSynthesis" in window)||!vOn)return;try{vMute=true;rec&&rec.stop()}catch(x){}speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="ar-EG";u.onend=u.onerror=function(){vMute=false;if(vOn){try{rec.start()}catch(x){}}};speechSynthesis.speak(u)}
-async function handleVoice(x){x=String(x).trim();if(!x)return;if(vBusy){vQ=x;return}vBusy=true;toast("🎤 "+x+"  ⏳");
+function speak(t){if(!vOn)return;try{vMute=true;rec&&rec.stop()}catch(x){}var back=function(){vMute=false;if(vOn){try{rec.start()}catch(x){}}};if("speechSynthesis" in window)speechSynthesis.cancel();ttsStop();cloudSpeak(t,back).then(function(ok){if(ok)return;if(!("speechSynthesis" in window)){back();return}var u=mkU(t);u.onend=u.onerror=back;speechSynthesis.speak(u)})}
+async function handleVoice(x){x=String(x).trim();if(!x)return;if(vBusy){vQ=x;return}if(x.split(/\s+/).length<=4&&!/(^|\s)(ايه|إيه|ازاي|إزاي|هل|ليه|فين|امتى|أمتى|مين|كام)(\s|$)/.test(x)){var fm=runCmd(x);if(fm){toast("🎤 "+x+" ← "+fm);return}}vBusy=true;toast("🎤 "+x+"  ⏳");
  try{var r=await agentAsk(x,"voice");if(r&&r.text){var t=clean(r.text);toast("🤖 "+t.slice(0,160));addMsg("u","🎤 "+x);addMsg("b",t);speak(t.slice(0,220))}else{var m=runCmd(x);toast("🎤 "+x+(m?" ← "+m:" (لم أفهم الأمر)"))}}
  catch(e){var m2=runCmd(x);toast(m2?"🎤 "+x+" ← "+m2:"⚠ "+errCopy(e))}
  vBusy=false;if(vQ){var n=vQ;vQ=null;handleVoice(n)}}
@@ -756,7 +766,7 @@ function setVoice(on){if(!SR){toast("متصفحك لا يدعم الأوامر �
   rec.onerror=function(e){if(e.error==="not-allowed"||e.error==="service-not-allowed"){vOn=false;$("#vc").setAttribute("aria-pressed","false");toast("المتصفح منع الميكروفون. اسمح له من إعدادات الموقع.")}};
   rec.onend=function(){if(vOn&&!vMute){try{rec.start()}catch(x){}}};
   try{rec.start();toast("🎤 بسمعك… كلمني عادي بالعامية")}catch(x){}}
- else{vMute=false;try{rec&&rec.stop()}catch(x){}if("speechSynthesis" in window)speechSynthesis.cancel();toast("تم إيقاف التحكم الصوتي")}}
+ else{vMute=false;try{rec&&rec.stop()}catch(x){}ttsStop();if("speechSynthesis" in window)speechSynthesis.cancel();toast("تم إيقاف التحكم الصوتي")}}
 $("#cmic").onclick=function(){if(!SR){toast("متصفحك لا يدعم الإدخال الصوتي. جرّب Chrome.");return}askPerm();var r=mkRec("ar-EG",false);r.onresult=function(e){sendChat(e.results[0][0].transcript)};r.onerror=function(){toast("تعذّر الوصول للميكروفون")};try{r.start();toast("🎤 تحدّث الآن…")}catch(x){}};
 /* routing */
 var firstR=true;if(document.startViewTransition)document.documentElement.classList.add("vt");
