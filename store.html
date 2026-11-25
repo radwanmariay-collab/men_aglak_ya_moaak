@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متجر تمكين — منتجات تسهّل الحياة</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ===== MotionSites Palette & Tokens (Organic Paper + Deep Forest + Electric Lime) ===== */
+:root {
+  --sand: #F6F1E4;
+  --card: #FFFDF8;
+  --line: #DCD3BC;
+  --olive: #264E36;
+  --deep: #111F16;
+  --yel: #D4F259;
+  --ink: #181D16;
+  --soft: #4F584B;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  color-scheme: light;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sand: #111813; --card: #1E2921; --line: #2E3D32; --ink: #F2EFE6; --soft: #B5BEB2;
+  }
+}
+:root[data-theme="dark"] {
+  --sand: #111813; --card: #1E2921; --line: #2E3D32; --ink: #F2EFE6; --soft: #B5BEB2;
+}
+
+html, body {
+  margin: 0; background: var(--sand); color: var(--ink);
+  font-family: Tajawal, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+* { box-sizing: border-box; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--yel); outline-offset: 3px; }
+::selection { background: var(--yel); color: var(--deep); }
+
+/* ===== Fixed Floating Glass Header + Scroll Progress ===== */
+header {
+  position: fixed;
+  top: calc(.65rem + env(safe-area-inset-top, 0px));
+  inset-inline: .75rem;
+  z-index: 50;
+  max-width: 84rem;
+  margin-inline: auto;
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  padding: .55rem 1.1rem;
+  border-radius: 9rem;
+  background: rgba(255, 253, 248, .85);
+  color: var(--ink);
+  border: 1px solid rgba(24, 29, 22, .14);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7);
+  backdrop-filter: blur(20px) saturate(1.7);
+  box-shadow: 0 10px 30px rgba(17, 31, 22, .12);
+  overflow: hidden;
+  transition: background .35s var(--ease), color .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+}
+header.scrolled {
+  background: rgba(17, 31, 22, .92);
+  color: #fff;
+  border-color: rgba(255, 255, 255, .18);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .32);
+}
+.scroll-bar {
+  position: absolute; bottom: 0; right: 0; height: 3px; width: 0%;
+  background: var(--yel); transition: width .1s linear;
+}
+
+header .logo {
+  font-weight: 900; font-size: 1.25rem; text-decoration: none;
+  display: flex; gap: .5rem; align-items: center; white-space: nowrap;
+}
+header .logo i {
+  width: .85rem; height: .85rem; background: var(--yel);
+  border: 2px solid var(--deep); border-radius: 50%; flex: none;
+}
+
+nav {
+  display: flex; gap: .25rem; align-items: center;
+  padding: .25rem; border-radius: 9rem;
+  background: rgba(24, 29, 22, .07);
+  overflow-x: auto; scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+header.scrolled nav { background: rgba(255, 255, 255, .1); }
+
+nav button, .cartb, .backb {
+  font: inherit; font-weight: 800; font-size: .92rem;
+  color: inherit; background: none; border: 0;
+  padding: .45rem .95rem; border-radius: 9rem; cursor: pointer;
+  white-space: nowrap; touch-action: manipulation;
+  transition: background .25s ease, color .25s ease, transform .25s var(--ease);
+}
+nav button:hover { background: rgba(212, 242, 89, .35); }
+nav button[aria-current="true"] {
+  background: var(--yel); color: var(--deep);
+  box-shadow: 0 4px 12px rgba(212, 242, 89, .35);
+}
+
+.hdr-actions { display: flex; gap: .45rem; align-items: center; }
+.backb {
+  text-decoration: none; border: 1.5px solid currentColor; opacity: .88;
+  display: inline-flex; align-items: center; gap: .3rem;
+}
+.backb:hover { opacity: 1; background: rgba(255, 255, 255, .15); }
+.cartb {
+  background: var(--deep); color: var(--yel);
+  border: 1.5px solid var(--deep);
+}
+header.scrolled .cartb {
+  background: var(--yel); color: var(--deep); border-color: var(--yel);
+}
+.cartb:hover { transform: translateY(-2px); }
+
+/* ===== MotionSites Kinetic Stage + Interactive Three.js 3D Models ===== */
+.stage {
+  position: relative; height: 100svh; min-height: 600px;
+  overflow: hidden; background: var(--sand);
+  border-radius: 0 0 2.5rem 2.5rem;
+  box-shadow: 0 24px 60px rgba(17, 31, 22, .16);
+  touch-action: pan-y;
+}
+#threeStage {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 3; pointer-events: none;
+}
+.sl {
+  position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden;
+  opacity: 0; pointer-events: none; z-index: 1;
+  transition: opacity .55s var(--ease), transform .7s var(--ease);
+  transform: scale(1.04);
+}
+.sl.active {
+  opacity: 1; pointer-events: auto; z-index: 2;
+  transform: scale(1);
+}
+.sl-photo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: .16; mix-blend-mode: multiply;
+  transform: scale(1.08); transition: transform 1.2s var(--ease);
+}
+.sl.active .sl-photo { transform: scale(1); }
+
+.sl .w {
+  position: absolute; inset-inline: 0; top: 50%; translate: 0 -56%;
+  text-align: center; font-weight: 900;
+  font-size: clamp(7.5rem, 30vw, 26rem); line-height: 1;
+  color: rgba(255, 255, 255, .78); white-space: nowrap;
+  user-select: none; z-index: 1;
+  transform: translateX(40px);
+  transition: transform .8s var(--ease);
+}
+.sl.active .w { transform: translateX(0); }
+
+.sl-badge {
+  position: absolute; top: 5.8rem; left: 50%; translate: -50% 0; z-index: 4;
+  background: rgba(255, 253, 248, .85); color: var(--deep);
+  border: 1px solid rgba(17, 31, 22, .15);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  padding: .35rem 1rem; border-radius: 9rem; font-size: .85rem; font-weight: 800;
+}
+
+.sl p {
+  position: absolute; inset-inline: 0; bottom: 5.8rem; z-index: 4;
+  text-align: center; margin: 0; color: var(--deep);
+  font-size: clamp(1.2rem, 2.6vw, 1.65rem); font-weight: 900; padding: 0 1rem;
+  text-shadow: 0 2px 12px rgba(255, 255, 255, .6);
+}
+.go {
+  position: absolute; bottom: 1.7rem; left: 50%; translate: -50% 0; z-index: 5;
+  font-weight: 900; font-size: 1.05rem; text-decoration: none;
+  background: var(--deep); color: var(--yel);
+  padding: .85rem 2.2rem; border-radius: 9rem;
+  box-shadow: 0 12px 28px rgba(17, 31, 22, .28);
+  transition: transform .35s var(--ease), background .25s, color .25s;
+}
+.go:hover { transform: translateY(-3px) scale(1.03); background: var(--yel); color: var(--deep); }
+
+.ar {
+  position: absolute; bottom: 1.5rem; z-index: 5;
+  width: 3.3rem; height: 3.3rem; border-radius: 50%;
+  border: 2px solid var(--deep); background: rgba(255, 255, 255, .75);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  color: var(--deep); cursor: pointer; display: grid; place-items: center;
+  touch-action: manipulation;
+  transition: transform .25s var(--ease), background .25s;
+}
+.ar:hover { transform: scale(1.08); background: var(--yel); }
+.ar:active { transform: scale(.95); }
+.ar.p { right: 1.4rem; }
+.ar.n { left: 1.4rem; }
+.ar svg { width: 1.4rem; height: 1.4rem; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ===== Kinetic Velocity Marquee ===== */
+.marquee-wrap {
+  overflow: hidden; background: var(--deep); color: var(--yel);
+  padding: 1rem 0; margin: .75rem .75rem 0; border-radius: 1.5rem;
+}
+.marquee-track {
+  display: flex; width: max-content; gap: 2.5rem;
+  font-size: clamp(1.2rem, 2.5vw, 1.75rem); font-weight: 900;
+  animation: mq 26s linear infinite;
+}
+.marquee-track span { display: inline-flex; align-items: center; gap: 1.1rem; }
+.marquee-track span::after { content: "✦"; color: #fff; font-size: .9rem; opacity: .6; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(50%); } }
+
+/* ===== Shop Catalog & 3D Tilt Cards with Photos ===== */
+main { max-width: 84rem; margin: 0 auto; padding: 4.5rem 1.4rem 6rem; scroll-margin-top: 4.5rem; }
+.ey {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .88rem; font-weight: 800; color: var(--olive); margin-bottom: .5rem;
+}
+.ey::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--olive); }
+h2 { font-size: clamp(2.4rem, 7vw, 4.8rem); margin: 0 0 .5rem; font-weight: 900; line-height: 1.05; letter-spacing: -.02em; }
+.sub { color: var(--soft); font-size: 1.25rem; margin: 0 0 2rem; }
+
+.chips { display: flex; gap: .55rem; flex-wrap: wrap; margin-bottom: 2.2rem; }
+.chips button {
+  font: inherit; font-weight: 800; font-size: 1rem;
+  color: var(--ink); background: var(--card);
+  border: 1.5px solid var(--line); border-radius: 9rem;
+  padding: .55rem 1.35rem; cursor: pointer;
+  touch-action: manipulation;
+  transition: transform .25s var(--ease), background .25s, color .25s, border-color .25s;
+}
+.chips button:hover { transform: translateY(-2px); border-color: var(--deep); }
+.chips button[aria-pressed="true"] { background: var(--deep); color: var(--yel); border-color: var(--deep); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19.5rem, 1fr)); gap: 1.6rem; }
+.pc {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 1.85rem; padding: 1.35rem;
+  box-shadow: 0 16px 36px -18px rgba(17, 31, 22, .22);
+  display: flex; flex-direction: column; gap: .75rem;
+  position: relative; isolation: isolate;
+  animation: cardIn .45s var(--ease) both;
+  transition: transform .3s var(--ease), box-shadow .35s var(--ease);
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pc[hidden] { display: none !important; }
+.pc:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -16px rgba(17, 31, 22, .28); }
+.pc.tilt { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px); }
+.pc::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 10%), rgba(212, 242, 89, .3), transparent 58%);
+  opacity: 0; pointer-events: none; transition: opacity .35s;
+}
+.pc:hover::before { opacity: 1; }
+
+.pc .im {
+  height: 15.5rem; border-radius: 1.35rem;
+  display: grid; place-items: center; position: relative; overflow: hidden;
+  border: 1px solid var(--line); cursor: pointer;
+}
+.pc .im svg { width: 7.5rem; height: 7.5rem; z-index: 1; transition: transform .6s var(--ease); }
+.pc .ph {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 2; transition: transform .7s var(--ease);
+}
+.pc:hover .ph { transform: scale(1.07); }
+.pc .qv-tag {
+  position: absolute; top: .7rem; right: .7rem; z-index: 3;
+  background: rgba(17, 31, 22, .78); color: var(--yel);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  padding: .25rem .75rem; border-radius: 9rem; font-size: .78rem; font-weight: 800;
+}
+
+.pc small { font-weight: 800; font-size: .82rem; color: var(--olive); letter-spacing: .06em; }
+.pc h3 { margin: .1rem 0 0; font-size: 1.45rem; font-weight: 800; line-height: 1.25; }
+.pc p { margin: 0; font-size: 1.02rem; color: var(--soft); flex: 1; }
+
+.add {
+  font: inherit; font-weight: 900; font-size: 1.05rem;
+  background: var(--yel); color: var(--deep);
+  border: 0; border-radius: .95rem; padding: .9rem; cursor: pointer;
+  position: relative; overflow: hidden; isolation: isolate;
+  transition: color .35s var(--ease), transform .2s;
+}
+.add::before {
+  content: ""; position: absolute; inset: 0;
+  background: var(--deep); translate: 0 102%;
+  transition: translate .4s var(--ease); z-index: -1;
+}
+.add:hover, .add:focus-visible { color: var(--yel); }
+.add:hover::before, .add:focus-visible::before { translate: 0 0; }
+.add:active { transform: scale(.97); }
+
+.up {
+  position: absolute; inset-inline: .7rem; bottom: .7rem; z-index: 4;
+  background: var(--deep); color: var(--yel); border-radius: 2rem;
+  padding: .35rem .9rem; font-weight: 800; font-size: .85rem; text-align: center; cursor: pointer;
+}
+.note { margin-top: 2.5rem; font-size: .95rem; color: var(--soft); }
+
+/* ===== 3D Quick-View Modal ===== */
+.qv-modal {
+  position: fixed; inset: 0; z-index: 70;
+  background: rgba(17, 31, 22, .75);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  display: none; place-items: center; padding: 1.2rem;
+}
+.qv-modal.open { display: grid; animation: fadeIn .35s var(--ease); }
+@keyframes fadeIn { from { opacity: 0; } }
+.qv-box {
+  background: var(--card); color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 2.2rem;
+  max-width: 48rem; width: 100%; overflow: hidden;
+  display: grid; grid-template-columns: 1fr;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .4);
+}
+@media(min-width: 720px) { .qv-box { grid-template-columns: 1fr 1fr; } }
+.qv-media { position: relative; min-height: 18rem; background: var(--sand); }
+.qv-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.qv-info { padding: 2rem; display: flex; flex-direction: column; gap: 1rem; justify-content: space-between; }
+
+/* ===== Cart Drawer ===== */
+aside {
+  position: fixed; inset: 0 auto 0 0; width: min(24rem, 100%);
+  background: var(--card); color: var(--ink); z-index: 60;
+  padding: 1.4rem; translate: -105% 0;
+  transition: translate .5s var(--ease);
+  display: flex; flex-direction: column; gap: .9rem;
+  border-inline-end: 1.5px solid var(--line);
+  box-shadow: 20px 0 60px rgba(0, 0, 0, .25);
+}
+aside.on { translate: 0 0; }
+aside ul { list-style: none; margin: 0; padding: 0; flex: 1; overflow: auto; }
+aside li { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .75rem 0; border-bottom: 1px solid var(--line); font-weight: 700; }
+aside li button { font: inherit; font-size: .88rem; background: var(--sand); border: 1px solid var(--line); border-radius: 2rem; padding: .25rem .7rem; color: inherit; cursor: pointer; }
+aside .x { align-self: flex-start; font: inherit; font-weight: 800; background: none; border: 1.5px solid var(--line); color: inherit; border-radius: 2rem; padding: .35rem 1rem; cursor: pointer; }
+.msg { min-height: 1.4rem; font-size: .92rem; font-weight: 700; color: var(--olive); }
+
+@media (max-width: 768px) {
+  header { flex-wrap: wrap; border-radius: 1.5rem; padding: .6rem .9rem; }
+  nav { order: 3; width: 100%; justify-content: center; }
+  .sl p { bottom: 6.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<header id="hdr">
+ <div class="scroll-bar" id="sbar"></div>
+ <a class="logo" href="index.html" aria-label="العودة لموقع تمكين"><i></i>تمكين <span style="opacity:.7;font-weight:600">/ المتجر</span></a>
+ <nav id="tabs" aria-label="الأقسام"></nav>
+ <div class="hdr-actions">
+  <a class="backb" href="index.html" aria-label="الرجوع للموقع الرئيسي">الرئيسية ↗</a>
+  <button class="cartb" id="cb" aria-label="فتح السلة">طلبي (<span id="cn">0</span>)</button>
+ </div>
+</header>
+
+<section class="stage" id="stage" aria-label="أقسام المتجر">
+ <canvas id="threeStage" aria-hidden="true"></canvas>
+ <button class="ar p" id="pv" type="button" aria-label="القسم السابق"><svg viewBox="0 0 28 28"><path d="M4 14h20M16 6l8 8-8 8"/></svg></button>
+ <button class="ar n" id="nx" type="button" aria-label="القسم التالي"><svg viewBox="0 0 28 28"><path d="M24 14H4M12 6l-8 8 8 8"/></svg></button>
+ <a class="go" href="#shop">تسوّق الآن ↓</a>
+</section>
+
+<div class="marquee-wrap" aria-hidden="true">
+ <div class="marquee-track">
+  <span>أدوات مساعدة للحركة</span>
+  <span>سماعات ومنبّهات ذكية</span>
+  <span>عدسات مكبّرة وساعات ناطقة</span>
+  <span>أدوات مريحة للحياة اليومية</span>
+  <span>توصيل وتجهيز ميسّر</span>
+  <span>أدوات مساعدة للحركة</span>
+  <span>سماعات ومنبّهات ذكية</span>
+  <span>عدسات مكبّرة وساعات ناطقة</span>
+  <span>أدوات مريحة للحياة اليومية</span>
+  <span>توصيل وتجهيز ميسّر</span>
+ </div>
+</div>
+
+<main id="shop">
+ <span class="ey">كتالوج المتجر</span>
+ <h2>منتجات تساعدك كل يوم</h2>
+ <p class="sub">اختار القسم اللي يناسبك، اضغط على أي منتج لمعاينته، وأضفه لطلبك.</p>
+ <div class="chips" id="chips" role="group" aria-label="فلترة المنتجات"></div>
+ <div class="grid" id="grid"></div>
+ <p class="note">المنتجات هنا نماذج للعرض. الأسعار والدفع بيتضافوا لما نربط المتجر بمورّدين حقيقيين.</p>
+</main>
+
+<!-- Quick-View Modal -->
+<div class="qv-modal" id="qvModal" role="dialog" aria-modal="true" aria-label="تفاصيل المنتج">
+ <div class="qv-box">
+  <div class="qv-media"><img id="qvImg" src="" alt=""></div>
+  <div class="qv-info">
+   <div>
+    <span class="ey" id="qvCat"></span>
+    <h3 id="qvTitle" style="font-size:1.75rem;margin:.3rem 0"></h3>
+    <p id="qvDesc" style="color:var(--soft);font-size:1.05rem;line-height:1.7"></p>
+   </div>
+   <div style="display:flex;gap:.6rem">
+    <button class="add" id="qvAdd" type="button" style="flex:1">أضف لطلبي</button>
+    <button class="chips" id="qvClose" type="button" style="margin:0;padding:.8rem 1.2rem;border-radius:.95rem;border:1.5px solid var(--line);background:none;font-weight:800;cursor:pointer">إغلاق</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<aside id="cart" aria-label="طلبي" aria-hidden="true">
+ <button class="x" id="cx" type="button">إغلاق ✕</button>
+ <h2 style="font-size:1.6rem">طلبي</h2>
+ <ul id="cl"></ul>
+ <div class="msg" id="msg" role="status"></div>
+ <button class="add" id="send" type="button">إرسال الطلب</button>
+</aside>
+
+<script>
+var Y="#D4F259",D="#111F16",O="#264E36",S="#E3D9BE";
+
+/* ===== Supabase Config (Sync Cart Orders when logged in) ===== */
+var CONFIG={
+  supabaseUrl:"",     // ضع هنا Supabase Project URL
+  supabaseAnonKey:""  // ضع هنا Supabase Anon Public Key
+};
+var sb=(window.supabase&&CONFIG.supabaseUrl&&CONFIG.supabaseAnonKey)?window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseAnonKey):null;
+
+var CATS=[
+{k:"move",n:"الحركة",w:"حركة",bg:"#D7E3BE",t:"تنقّل بحرية وراحة أكبر",
+ photo:"https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=1200&q=80",
+ svg:'<svg viewBox="0 0 200 200" fill="none" stroke="'+D+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><circle cx="82" cy="132" r="48" fill="'+S+'"/><circle cx="82" cy="132" r="8" fill="'+Y+'" stroke="none"/><path d="M82 132L66 54h28M66 54V28M94 54l52 34 18 52M60 98h50"/><circle cx="160" cy="150" r="14" fill="'+Y+'"/></svg>'},
+{k:"hear",n:"السمع",w:"سمع",bg:"#E9DFC5",t:"أصوات أوضح وتنبيهات تحس بيها",
+ photo:"https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?auto=format&fit=crop&w=1200&q=80",
+ svg:'<svg viewBox="0 0 200 200" fill="none" stroke="'+D+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M64 150c0-26 8-34 18-46 10-12 14-22 14-34a34 34 0 0168 0c0 22-14 30-22 40-8 10-6 22-16 34-8 10-26 8-30-4"/><path d="M104 76a14 14 0 0128 0c0 12-10 14-14 22"/><circle cx="60" cy="150" r="14" fill="'+Y+'" stroke="none"/></svg>'},
+{k:"see",n:"البصر",w:"بصر",bg:"#E5F0A8",t:"رؤية أوضح وقراءة أسهل",
+ photo:"https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=1200&q=80",
+ svg:'<svg viewBox="0 0 200 200" fill="none" stroke="'+D+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><circle cx="86" cy="86" r="48" fill="#FFFDF8"/><circle cx="86" cy="86" r="22" fill="'+O+'" stroke="none"/><path d="M122 122l48 48"/></svg>'},
+{k:"home",n:"الحياة اليومية",w:"يومي",bg:"#EFE3C6",t:"أدوات بسيطة تسهّل التفاصيل الصغيرة",
+ photo:"https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200&q=80",
+ svg:'<svg viewBox="0 0 200 200" fill="none" stroke="'+D+'" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M50 70h86v50a36 36 0 01-36 36H86a36 36 0 01-36-36z" fill="#FFFDF8"/><path d="M136 84h14a22 22 0 010 44h-14"/><path d="M80 40c-8 8 8 14 0 22M106 40c-8 8 8 14 0 22" stroke="'+O+'"/><circle cx="92" cy="112" r="9" fill="'+Y+'" stroke="none"/></svg>'}];
+
+var P=[
+["move","كرسي متحرك خفيف","تنقّل يومي أسهل داخل البيت وخارجه، بهيكل ألومنيوم متين وقابل للطي السريع.","https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=800&q=80"],
+["move","عصا مشي قابلة للطي","دعم ثابت أثناء المشي، خفيفة الوزن وسهلة الحمل والتخزين في الحقيبة.","https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80"],
+["hear","سماعة معينة سمعية","تساعد على سماع الأصوات والكلام بوضوح أكبر مع عزل الضوضاء المحيطة.","https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?auto=format&fit=crop&w=800&q=80"],
+["hear","منبّه اهتزازي للباب","ينبّهك باهتزاز قوي أو إضاءة وامضة لما حد يخبّط أو يرن الجرس.","https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80"],
+["see","عدسة مكبّرة مضيئة","تكبّر الكتابة الصغيرة بوضوح وتنوّر الصفحة بإضاءة LED مريحة للقراءة.","https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=800&q=80"],
+["see","ساعة ناطقة","تقول لك الوقت والتاريخ بصوت عربي واضح بضغطة زر واحدة.","https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=800&q=80"],
+["home","كوب بمقبض عريض","مسكة أثبت وأريح لليد تمنع الانزلاق وتحافظ على حرارة المشروب.","https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=800&q=80"],
+["home","أدوات مطبخ بقبضة مريحة","مقابض عريضة مانعة للانزلاق تقلّل الجهد أثناء الطبخ والتقطيع اليومي.","https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80"]];
+
+var $=function(s,r){return(r||document).querySelector(s)};
+var st=$("#stage"),tabs=$("#tabs"),hdr=$("#hdr"),cur=0,pause=0,cart=[],filt="all";
+
+/* ===== MotionSites Interactive 3D Models via Three.js (Changes per Category!) ===== */
+var threeModels=[],threeScene,threeCamera,threeRenderer,mouseX=0,mouseY=0;
+(function(){
+  var cv=$("#threeStage");
+  if(!cv||!window.THREE)return;
+  threeScene=new THREE.Scene();
+  threeCamera=new THREE.PerspectiveCamera(42, cv.offsetWidth/cv.offsetHeight, 0.1, 100);
+  threeCamera.position.z=6.2;
+
+  threeRenderer=new THREE.WebGLRenderer({canvas:cv, alpha:true, antialias:true});
+  threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  threeRenderer.setSize(cv.offsetWidth, cv.offsetHeight);
+
+  // Lighting
+  var amb=new THREE.AmbientLight(0xffffff, 0.75);
+  threeScene.add(amb);
+  var dir1=new THREE.DirectionalLight(0xD4F259, 1.3);
+  dir1.position.set(5, 6, 7);
+  threeScene.add(dir1);
+  var dir2=new THREE.DirectionalLight(0x264E36, 0.9);
+  dir2.position.set(-5, -4, 4);
+  threeScene.add(dir2);
+
+  var matMain=new THREE.MeshStandardMaterial({color:0x111F16, roughness:0.25, metalness:0.35});
+  var matLime=new THREE.MeshStandardMaterial({color:0xD4F259, roughness:0.2, metalness:0.15});
+  var matWire=new THREE.MeshBasicMaterial({color:0x264E36, wireframe:true, transparent:true, opacity:0.22});
+
+  // Model 0: Mobility (Gyroscopic Precision Wheel + Orbiting Ring)
+  var g0=new THREE.Group();
+  var wheel=new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.22, 24, 64), matMain);
+  var hub=new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.4, 24), matLime);
+  hub.rotation.x=Math.PI/2;
+  var outerOrbit=new THREE.Mesh(new THREE.TorusGeometry(1.85, 0.04, 12, 64), matLime);
+  outerOrbit.rotation.x=0.6;
+  g0.add(wheel, hub, outerOrbit);
+
+  // Model 1: Hearing (Acoustic Soundwave Concentric Rings)
+  var g1=new THREE.Group();
+  [0.6, 1.05, 1.5, 1.95].forEach(function(rad, idx){
+    var ring=new THREE.Mesh(new THREE.TorusGeometry(rad, 0.08 - idx*0.01, 20, 64), idx%2===0 ? matLime : matMain);
+    ring.rotation.y=idx*0.25;
+    g1.add(ring);
+  });
+
+  // Model 2: Vision (Optical Crystal Lens + Aperture Ring)
+  var g2=new THREE.Group();
+  var lens=new THREE.Mesh(new THREE.IcosahedronGeometry(1.25, 2), new THREE.MeshPhysicalMaterial({
+    color:0xD4F259, roughness:0.1, metalness:0.1, transparent:true, opacity:0.82
+  }));
+  var frame=new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.14, 20, 64), matMain);
+  var cage=new THREE.Mesh(new THREE.IcosahedronGeometry(1.8, 1), matWire);
+  g2.add(lens, frame, cage);
+
+  // Model 3: Daily Living (Smooth Morphing TorusKnot Ergonomic Sculpture)
+  var g3=new THREE.Group();
+  var knot=new THREE.Mesh(new THREE.TorusKnotGeometry(1.05, 0.32, 100, 20), matMain);
+  var core=new THREE.Mesh(new THREE.OctahedronGeometry(0.65, 0), matLime);
+  g3.add(knot, core);
+
+  threeModels=[g0, g1, g2, g3];
+  threeModels.forEach(function(m, i){
+    m.visible=(i===0);
+    threeScene.add(m);
+  });
+
+  window.addEventListener("resize", function(){
+    if(!cv.offsetWidth)return;
+    threeCamera.aspect=cv.offsetWidth/cv.offsetHeight;
+    threeCamera.updateProjectionMatrix();
+    threeRenderer.setSize(cv.offsetWidth, cv.offsetHeight);
+  });
+
+  document.addEventListener("pointermove", function(e){
+    mouseX=(e.clientX/window.innerWidth - 0.5)*2;
+    mouseY=(e.clientY/window.innerHeight - 0.5)*2;
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    if(document.hidden || scrollY > innerHeight) return;
+    var activeM=threeModels[cur];
+    if(activeM){
+      activeM.rotation.y += 0.008;
+      activeM.rotation.x += (mouseY*0.35 - activeM.rotation.x)*0.05;
+      activeM.rotation.z += (-mouseX*0.25 - activeM.rotation.z)*0.05;
+    }
+    threeRenderer.render(threeScene, threeCamera);
+  }
+  animate();
+})();
+
+/* Build Stage Slides & Top Nav */
+CATS.forEach(function(c,i){
+ var s=document.createElement("div");
+ s.className="sl" + (i===0 ? " active" : "");
+ s.style.background=c.bg;
+ s.innerHTML='<img class="sl-photo" src="'+c.photo+'" alt=""><div class="sl-badge">نموذج 3D تفاعلي · '+c.n+'</div><div class="w" aria-hidden="true">'+c.w+'</div><p>'+c.t+'</p>';
+ st.insertBefore(s,st.firstChild);
+ c.el=s;
+
+ var b=document.createElement("button");
+ b.type="button";
+ b.textContent=c.n;
+ b.dataset.k=c.k;
+ b.onclick=function(e){
+   e.stopPropagation();
+   go(i, true);
+   setFilter(c.k);
+   if(scrollY > innerHeight * 0.35){
+     $("#shop").scrollIntoView({behavior:"smooth"});
+   }
+ };
+ tabs.appendChild(b);
+ c.tab=b;
+});
+
+function syncNavUI(){
+  var inShop = scrollY > innerHeight * 0.35;
+  CATS.forEach(function(c,i){
+    var isCurrent = (inShop && filt !== "all") ? (c.k === filt) : (i === cur);
+    c.tab.setAttribute("aria-current", isCurrent ? "true" : "false");
+  });
+}
+
+/* Smooth Instant Slide Switching + 3D Model Switch */
+function go(n, user){
+ if(user) pause = Date.now();
+ n = (n + CATS.length) % CATS.length;
+ cur = n;
+ CATS.forEach(function(c, i){
+   c.el.classList.toggle("active", i === cur);
+ });
+ if(threeModels.length){
+   threeModels.forEach(function(m, i){
+     m.visible = (i === cur);
+     if(i === cur) m.scale.set(0.85, 0.85, 0.85);
+   });
+ }
+ syncNavUI();
+}
+
+$("#pv").onclick=function(e){e.stopPropagation(); go(cur-1, true);};
+$("#nx").onclick=function(e){e.stopPropagation(); go(cur+1, true);};
+
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+  if(e.key==="ArrowLeft") go(cur+1, true);
+  if(e.key==="ArrowRight") go(cur-1, true);
+});
+
+var x0=null;
+st.addEventListener("pointerdown",function(e){
+  if(e.target.closest("button, a")) return;
+  x0=e.clientX;
+});
+st.addEventListener("pointerup",function(e){
+  if(x0===null) return;
+  var dx=e.clientX-x0;
+  x0=null;
+  if(Math.abs(dx)>45) go(cur + (dx<0 ? 1 : -1), true);
+});
+st.addEventListener("pointercancel",function(){x0=null;});
+
+setInterval(function(){
+  if(!document.hidden && scrollY < innerHeight*0.6 && Date.now()-pause > 7000){
+    go(cur+1, false);
+  }
+}, 5000);
+
+/* Scroll-aware Header & Progress Bar */
+function onScroll(){
+  hdr.classList.toggle("scrolled", scrollY > 60);
+  var maxScroll=document.documentElement.scrollHeight - innerHeight;
+  if(maxScroll>0) $("#sbar").style.width=Math.min(100, (scrollY/maxScroll)*100)+"%";
+  syncNavUI();
+}
+window.addEventListener("scroll", onScroll, {passive:true});
+onScroll();
+
+/* Products with Real Photos, Quick-View & Synchronized Filter Chips */
+var chips=$("#chips"),grid=$("#grid"),qvItem=null;
+
+function openQV(p, catName){
+  qvItem=p[1];
+  $("#qvImg").src=p[3];
+  $("#qvCat").textContent=catName;
+  $("#qvTitle").textContent=p[1];
+  $("#qvDesc").textContent=p[2];
+  $("#qvModal").classList.add("open");
+}
+$("#qvClose").onclick=function(){$("#qvModal").classList.remove("open")};
+$("#qvModal").onclick=function(e){if(e.target===this)this.classList.remove("open")};
+$("#qvAdd").onclick=function(){
+  if(!qvItem)return;
+  cart.push(qvItem);draw();$("#msg").textContent="اتضاف: "+qvItem;
+  $("#qvModal").classList.remove("open");open_(true);
+};
+
+function setFilter(k){
+  filt = k;
+  var idx = CATS.findIndex(function(c){return c.k === k;});
+  if(idx > -1 && idx !== cur){
+    go(idx, false);
+  }
+  [].forEach.call(chips.children,function(b){
+    b.setAttribute("aria-pressed", b.dataset.k === k ? "true" : "false");
+  });
+  [].forEach.call(grid.children,function(c){
+    var show = (k === "all" || c.dataset.c === k);
+    c.hidden = !show;
+    if(show){
+      c.style.animation = "none";
+      void c.offsetWidth;
+      c.style.animation = "";
+    }
+  });
+  syncNavUI();
+}
+
+[["all","الكل"]].concat(CATS.map(function(c){return[c.k,c.n]})).forEach(function(a){
+  var b=document.createElement("button");
+  b.type="button";
+  b.textContent=a[1];
+  b.dataset.k=a[0];
+  b.onclick=function(){ setFilter(a[0]); };
+  chips.appendChild(b);
+});
+
+P.forEach(function(p,i){
+ var c=CATS.filter(function(x){return x.k===p[0]})[0],d=document.createElement("article");
+ d.className="pc";
+ d.dataset.c=p[0];
+ d.innerHTML='<div class="im" style="background:'+c.bg+'"><span class="qv-tag">معاينة ↗</span><img class="ph" alt="'+p[1]+'" src="'+p[3]+'" loading="lazy" onerror="this.hidden=true">'+c.svg+'</div><small>'+c.n+'</small><h3>'+p[1]+'</h3><p>'+p[2]+'</p><button class="add" type="button">أضف لطلبي</button>';
+ d.querySelector("svg").setAttribute("aria-hidden","true");
+ d.querySelector(".im").onclick=function(){openQV(p, c.n)};
+ d.querySelector(".add").onclick=function(){cart.push(p[1]);draw();$("#msg").textContent="اتضاف: "+p[1];open_(true)};
+ grid.appendChild(d);
+});
+setFilter("all");
+
+/* Lightweight 3D Tilt on Product Cards */
+(function(){
+  var fine=matchMedia("(hover:hover) and (pointer:fine)").matches,last=null,raf=0;
+  document.addEventListener("pointermove",function(e){
+    if(!fine||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+    var t=e.target.closest?e.target.closest(".pc"):null;
+    if(last&&last!==t){last.classList.remove("tilt");last.style.setProperty("--rx","0deg");last.style.setProperty("--ry","0deg")}
+    last=t;if(!t)return;
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(function(){
+      var r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+      t.classList.add("tilt");
+      t.style.setProperty("--mx",(x*100)+"%");t.style.setProperty("--my",(y*100)+"%");
+      t.style.setProperty("--ry",((x-.5)*-7)+"deg");t.style.setProperty("--rx",((y-.5)*5)+"deg");
+    });
+  });
+})();
+
+/* Cart + Supabase Order Sync */
+var ca=$("#cart");
+function draw(){
+  $("#cn").textContent=cart.length;
+  $("#cl").innerHTML=cart.length?"":"<li>لسه مفيش منتجات.</li>";
+  cart.forEach(function(n,i){
+    var l=document.createElement("li");
+    l.innerHTML="<span></span><button type='button'>حذف</button>";
+    l.firstChild.textContent=n;
+    l.lastChild.onclick=function(){cart.splice(i,1);draw()};
+    $("#cl").appendChild(l);
+  });
+}
+function open_(o){ca.classList.toggle("on",o);ca.setAttribute("aria-hidden",!o)}
+$("#cb").onclick=function(){open_(true)};
+$("#cx").onclick=function(){open_(false)};
+$("#send").onclick=async function(){
+  if(!cart.length){$("#msg").textContent="ضيف منتج الأول.";return;}
+  if(sb){
+    try{
+      var u=(await sb.auth.getUser()).data.user;
+      if(u){
+        await sb.from("store_orders").insert({user_id:u.id, items:cart});
+        $("#msg").textContent="تم حفظ طلبك في حسابك بنجاح!";
+        return;
+      }
+    }catch(e){}
+  }
+  $("#msg").textContent="تم تجهيز قائمة طلبك ("+cart.length+" منتجات). سجّل دخولك لحفظها في حسابك.";
+};
+draw();
+</script>
+</body>
+</html>
