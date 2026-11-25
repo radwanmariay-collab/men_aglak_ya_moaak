@@ -1537,23 +1537,133 @@ var ACT={name:"act",description:"Perform actions on the website: navigate{page},
  execute:async function(inp){var out=[];var L=(inp&&inp.actions)||[];for(var i=0;i<L.length;i++){try{out.push(await doAct(L[i]))}catch(e){out.push("ERROR: "+((e&&e.message)||e))}}return{results:out,state:siteState()}}};
 function SYS(){return "أنت «مساعد تمكين»، وكيل ذكاء اصطناعي داخل موقع تمكين. نفّذ ما يطلبه المستخدم بالأداة act وأجب بالعامية المصرية باختصار.\nمعلومات الموقع:\n"+kbText()}
 function errCopy(e){return "حصلت مشكلة مؤقتة في الوكيل الذكي."}
-async function endpointAsk(text,via,onText){var msgs=[],h2=hist.slice(-4);while(h2.length&&h2[0].r!=="u")h2.shift();h2.forEach(function(m){msgs.push({role:m.r==="u"?"user":"assistant",content:m.t})});
- msgs.push({role:"user",content:"[حالة الصفحة] "+siteState()+"\n[القناة] "+via+"\n[طلب المستخدم] "+text});
- var tools=[{name:ACT.name,description:ACT.description,input_schema:ACT.inputSchema}],out="";
- for(var i=0;i<4;i++){var res=await fetch(CONFIG.endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system:SYS(),messages:msgs,tools:tools,fast:via==="voice"})});if(!res.ok)throw{code:"upstream_error",status:res.status};var j=await res.json();
-  var tx=(j.content||[]).filter(function(c){return c.type==="text"}).map(function(c){return c.text}).join("\n");if(tx){out+=(out?"\n\n":"")+tx;if(onText)onText(clean(out))}
-  var tu=(j.content||[]).filter(function(c){return c.type==="tool_use"});if(j.stop_reason!=="tool_use"||!tu.length)break;
-  msgs.push({role:"assistant",content:j.content});var rs=[];for(var k=0;k<tu.length;k++){var rr;try{rr=JSON.stringify(await ACT.execute(tu[k].input))}catch(e){rr="Error: "+((e&&e.message)||e)}rs.push({type:"tool_result",tool_use_id:tu[k].id,content:rr})}msgs.push({role:"user",content:rs})}
- hist.push({r:"u",t:text},{r:"b",t:clean(out)});return{text:out||"تمام"}}
-async function agentAsk(text,via,onText){if(aiOff)return null;if(CONFIG.endpoint)return endpointAsk(text,via,onText);return null}
-function setSend(b){var x=$("#cf button[type=submit]");if(x)x.textContent=b?"إيقاف":"إرسال"}
-async function sendChat(q){q=q.trim();if(!q||chatBusy)return;addMsg("u",q);$("#ci").value="";var b=addMsg("b","🤔 بفكر…");chatBusy=true;setSend(true);var done=false;
- var chipHit=[].slice.call($$("#cchips button")).some(function(c){return c.textContent.trim()===q});try{var r=chipHit?null:await agentAsk(q,"chat",function(t){if(t)b.textContent=t});if(r&&r.text){b.textContent=clean(r.text)||"تمام";$("#cs").textContent="🧠 وكيل ذكاء اصطناعي";done=true}}
- catch(e){b.textContent="تعذّر الاتصال بالوكيل.";done=true}
- if(!done){var a=localAnswer(q);b.textContent=a.text;hist.push({r:"u",t:q},{r:"b",t:a.text});$("#cs").textContent=chipHit?"⚡ رد سريع":"وضع مبسّط";if(a.go)goPage(a.go)}
- chatBusy=false;setSend(false);$("#cm").scrollTop=1e5}
-$("#cf").addEventListener("submit",function(e){e.preventDefault();if(chatBusy&&ctl){e.stopImmediatePropagation();ctl.abort();return}sendChat($("#ci").value)});
+async function endpointAsk(text, via, onText) {
+  var msgs = [], h2 = hist.slice(-4);
+  while (h2.length && h2[0].r !== "u") h2.shift();
+  h2.forEach(function(m) {
+    msgs.push({ role: m.r === "u" ? "user" : "assistant", content: m.t });
+  });
+  msgs.push({ role: "user", content: "[حالة الصفحة] " + siteState() + "\n[القناة] " + via + "\n[طلب المستخدم] " + text });
 
+  var tools = [{ name: ACT.name, description: ACT.description, input_schema: ACT.inputSchema }], out = "";
+  for (var i = 0; i < 4; i++) {
+    var res = await fetch(CONFIG.endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ system: SYS(), messages: msgs, tools: tools, fast: via === "voice" })
+    });
+    var j = await res.json();
+    if (!res.ok) throw new Error(j.error || ("HTTP " + res.status));
+
+    var tx = (j.content || []).filter(function(c) { return c.type === "text"; }).map(function(c) { return c.text; }).join("\n");
+    if (tx) { out += (out ? "\n\n" : "") + tx; if (onText) onText(clean(out)); }
+
+    var tu = (j.content || []).filter(function(c) { return c.type === "tool_use"; });
+    if (j.stop_reason !== "tool_use" || !tu.length) break;
+
+    msgs.push({ role: "assistant", content: j.content });
+    var rs = [];
+    for (var k = 0; k < tu.length; k++) {
+      var rr;
+      try { rr = JSON.stringify(await ACT.execute(tu[k].input)); } catch (e) { rr = "Error: " + ((e && e.message) || e); }
+      rs.push({ type: "tool_result", tool_use_id: tu[k].id, content: rr });
+    }
+    msgs.push({ role: "user", content: rs });
+  }
+  hist.push({ r: "u", t: text }, { r: "b", t: clean(out) });
+  return { text: out || "تمام" };
+}
+
+/* دالة تشغيل فيديو HeyGen Avatar لأي شرح في الموقع */
+async function askHeyGenAvatar(scriptText) {
+  var ep = CONFIG.endpoint.replace(/\/+$/, "") + "/heygen";
+  var res = await fetch(ep, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      endpoint: "https://api.heygen.com/v2/video/generate",
+      payload: {
+        video_inputs: [{
+          character: { type: "avatar", avatar_id: "Angela-inTshirt-20220820" },
+          voice: { type: "text", input_text: scriptText, voice_id: "1bd001e7e50f421d891986aad5158bc8" }
+        }],
+        dimension: { width: 1280, height: 720 }
+      }
+    })
+  });
+  return await res.json();
+}
+
+async function agentAsk(text, via, onText) {
+  if (aiOff) return null;
+  if (CONFIG.endpoint) return endpointAsk(text, via, onText);
+  return null;
+}
+
+function setSend(b) {
+  var x = $("#cf button[type=submit]");
+  if (x) x.textContent = b ? "إيقاف" : "إرسال";
+}
+
+async function sendChat(q) {
+  q = q.trim();
+  if (!q || chatBusy) return;
+  addMsg("u", q);
+  $("#ci").value = "";
+  var b = addMsg("b", "🤔 بفكر…");
+  chatBusy = true;
+  setSend(true);
+  var done = false;
+
+  // لو المستخدم طلب فيديو أفاتار من HeyGen
+  if (/فيديو|افاتار|أفاتار|heygen|هايجين/i.test(q)) {
+    try {
+      b.textContent = "🎬 جاري إرسال طلب الفيديو إلى HeyGen…";
+      var hg = await askHeyGenAvatar(q);
+      if (hg && hg.data && hg.data.video_id) {
+        b.textContent = "✅ تم بدء تجهيز الفيديو في HeyGen! رقم الفيديو: " + hg.data.video_id;
+      } else {
+        b.textContent = "⚠ رد HeyGen: " + JSON.stringify(hg);
+      }
+      done = true;
+    } catch (e) {
+      b.textContent = "خطأ HeyGen: " + e.message;
+      done = true;
+    }
+  }
+
+  var chipHit = [].slice.call($$("#cchips button")).some(function(c) { return c.textContent.trim() === q; });
+  if (!done) {
+    try {
+      var r = chipHit ? null : await agentAsk(q, "chat", function(t) { if (t) b.textContent = t; });
+      if (r && r.text) {
+        b.textContent = clean(r.text) || "تمام";
+        $("#cs").textContent = "🧠 وكيل ذكاء اصطناعي (Groq)";
+        done = true;
+      }
+    } catch (e) {
+      b.textContent = "خطأ: " + (e.message || "تعذّر الاتصال بالوكيل");
+      done = true;
+    }
+  }
+
+  if (!done) {
+    var a = localAnswer(q);
+    b.textContent = a.text;
+    hist.push({ r: "u", t: q }, { r: "b", t: a.text });
+    $("#cs").textContent = chipHit ? "⚡ رد سريع" : "وضع مبسّط";
+    if (a.go) goPage(a.go);
+  }
+  chatBusy = false;
+  setSend(false);
+  $("#cm").scrollTop = 1e5;
+}
+
+$("#cf").addEventListener("submit", function(e) {
+  e.preventDefault();
+  if (chatBusy && ctl) { e.stopImmediatePropagation(); ctl.abort(); return; }
+  sendChat($("#ci").value);
+});
 function speak(t){if(!vOn)return;try{vMute=true;rec&&rec.stop()}catch(x){}var back=function(){vMute=false;if(vOn){try{rec.start()}catch(x){}}};if("speechSynthesis" in window)speechSynthesis.cancel();ttsStop();cloudSpeak(t,back).then(function(ok){if(ok)return;if(!("speechSynthesis" in window)){back();return}var u=mkU(t);u.onend=u.onerror=back;speechSynthesis.speak(u)})}
 async function handleVoice(x){x=String(x).trim();if(!x)return;if(vBusy){vQ=x;return}if(x.split(/\s+/).length<=4&&!/(^|\s)(ايه|إيه|ازاي|إزاي|هل|ليه|فين|امتى|أمتى|مين|كام)(\s|$)/.test(x)){var fm=runCmd(x);if(fm){toast("🎤 "+x+" ← "+fm);return}}vBusy=true;toast("🎤 "+x+"  ⏳");
  try{var r=await agentAsk(x,"voice");if(r&&r.text){var t=clean(r.text);toast("🤖 "+t.slice(0,160));addMsg("u","🎤 "+x);addMsg("b",t);speak(t.slice(0,220))}else{var m=runCmd(x);toast("🎤 "+x+(m?" ← "+m:" (لم أفهم الأمر)"))}}
