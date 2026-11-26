@@ -546,6 +546,58 @@ body.cur, body.cur * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.
 body.ruler #rul { display: block; }
 @media print { body * { visibility: hidden; } #ecard, #ecard * { visibility: visible; } #ecard { position: absolute; top: 0; right: 0; width: 100%; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* ================= لمسة تصميم جديدة: ظلال أوراق هادئة + أقسام ملونة (CSS فقط، لا تغيير في المنطق) ================= */
+/* إصلاح إزاحة الموبايل: بطاقات مجموعات المجتمع كانت تخرج خارج الصفحة وتوسّعها */
+.blk.trust { overflow-x: clip; }
+html { overflow-x: hidden; }
+
+/* خلفية سيج هادئة بدل الكريمي */
+body:not(.dusk):not(.dark):not(.hc) { --bg: #DCE3D6; --surface: #CBD5C5; }
+#ambientCanvas { opacity: 1; filter: blur(14px); transform: scale(1.06); }
+.paper-grain { opacity: .05; }
+
+/* الهيرو: شفاف فوق الخلفية المتحركة + عنوان أكبر وكلمة مظللة */
+.hero-card { background: transparent; border-color: transparent; box-shadow: none; backdrop-filter: none; }
+#ht { font-size: clamp(2.3rem, 5.6vw, 4.5rem); line-height: 1.16; letter-spacing: -.01em; }
+body:not(.dark):not(.hc) #ht > .w:last-of-type .i { background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 92%, transparent 92%); padding-inline: .12em; }
+.hero-lead { font-size: 1.12rem; }
+.hero-media { box-shadow: 0 30px 70px rgba(24, 35, 28, .22); border-radius: 2.2rem; }
+
+/* أقسام بألوان مختلفة بالعرض الكامل */
+.blk.bg2 { background: transparent; }
+#faq.blk.bg2 { background: linear-gradient(180deg, rgba(203,232,87,.30), rgba(203,232,87,.16)); }
+body.dark #faq.blk.bg2 { background: rgba(203,232,87,.06); }
+body.hc #faq.blk.bg2 { background: #000; }
+.blk.trust { background: var(--deep); color: #F3F6EF; }
+body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
+.blk.trust .ghostw, .blk.trust h2 { color: #F3F6EF; }
+.blk.trust .ghostw .k { color: var(--accent); }
+.blk.trust .pct { background: var(--accent); color: #18231C; }
+.blk.trust .pct b { color: #183624; }
+.blk.trust .dots { --dot: rgba(255,255,255,.35); }
+.blk.trust .ctl .ar { background: #F3F6EF; color: #18231C; }
+.blk.trust .ctl .ar.f { background: var(--accent); }
+.blk.trust .dc { color: var(--fg); }
+.blk.trust .bc { color: var(--fg); }
+
+/* كروت الخدمات: ارتفاع وتكبير صورة عند الوقوف عليها */
+.berry-showcase-grid > * { transition: transform .45s var(--ease), box-shadow .45s var(--ease); }
+.berry-showcase-grid > *:hover { transform: translateY(-6px); box-shadow: 0 24px 50px rgba(24,35,28,.16); }
+.berry-showcase-grid img { transition: transform .8s var(--ease); }
+.berry-showcase-grid > *:hover img { transform: scale(1.05); }
+
+/* ظهور تدريجي أثناء النزول (للمتصفحات التي تدعمه، ويحترم تقليل الحركة) */
+@keyframes tk-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    body:not(.calm) .berry-showcase-grid > *,
+    body:not(.calm) .blk .bc, body:not(.calm) .blk .pct,
+    body:not(.calm) .berry-lab, body:not(.calm) .faq-clean > * {
+      animation: tk-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 55%;
+    }
+  }
+}
 </style>
 </head><body class="locked">
 
@@ -955,59 +1007,49 @@ var CONFIG={
   supabaseAnonKey:"sb_publishable_eRYrHdwSDhXs27FXFC2G0A_VBIugm3_"
 };
 
-/* ===== خلفية الموقع المتحركة الهادئة على طريقة Berry (Ambient Calm Waves) ===== */
+/* ===== خلفية الموقع المتحركة الهادئة على طريقة Berry (ظلال أوراق تتحرك ببطء) ===== */
 (function initAmbientBackground(){
   var cv=$("#ambientCanvas");
   if(!cv)return;
   var ctx=cv.getContext("2d");
-  var w=0, h=0, t=0;
+  var w=0, h=0, t=0, last=0, SC=4;
+  var blobs=[];
+  for(var i=0;i<18;i++){blobs.push({x:Math.random(),y:Math.random(),len:.10+Math.random()*.2,wid:.018+Math.random()*.035,rot:-.55+Math.random()*.3,sp:.25+Math.random()*.5,ph:Math.random()*6.28,a:.11+Math.random()*.11});}
   function resize(){
-    w=cv.width=window.innerWidth;
-    h=cv.height=window.innerHeight;
+    w=cv.width=Math.ceil(window.innerWidth/SC);
+    h=cv.height=Math.ceil(window.innerHeight/SC);
   }
   window.addEventListener("resize",resize);
   resize();
-
-  function draw(){
-    requestAnimationFrame(draw);
-    if(document.hidden || document.body.classList.contains("hc")) return;
-    if(!document.body.classList.contains("calm")) t += 0.0045;
-
+  function paint(){
     ctx.clearRect(0,0,w,h);
-    var isDark=document.body.classList.contains("dark");
-    var isDusk=document.body.classList.contains("dusk");
-
-    var orbs=[
-      {
-        x: w*0.22 + Math.sin(t*0.9)*w*0.14,
-        y: h*0.25 + Math.cos(t*0.7)*h*0.12,
-        r: Math.max(w,h)*0.42,
-        c: isDark ? "rgba(154, 217, 90, 0.08)" : (isDusk ? "rgba(218, 178, 108, 0.18)" : "rgba(203, 232, 87, 0.18)")
-      },
-      {
-        x: w*0.78 + Math.cos(t*0.8)*w*0.15,
-        y: h*0.65 + Math.sin(t*0.6)*h*0.14,
-        r: Math.max(w,h)*0.48,
-        c: isDark ? "rgba(31, 73, 48, 0.25)" : (isDusk ? "rgba(196, 164, 118, 0.16)" : "rgba(186, 214, 194, 0.24)")
-      },
-      {
-        x: w*0.5 + Math.sin(t*0.5)*w*0.18,
-        y: h*0.85 + Math.cos(t*0.85)*h*0.1,
-        r: Math.max(w,h)*0.38,
-        c: isDark ? "rgba(203, 232, 87, 0.05)" : "rgba(235, 224, 198, 0.35)"
-      }
-    ];
-
-    for(var i=0;i<orbs.length;i++){
-      var o=orbs[i];
-      var g=ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-      g.addColorStop(0, o.c);
-      g.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle=g;
-      ctx.fillRect(0,0,w,h);
+    var dark=document.body.classList.contains("dark"), dusk=document.body.classList.contains("dusk");
+    var rgb = dark ? "154,217,90" : (dusk ? "92,64,28" : "24,52,36");
+    var m=Math.max(w,h);
+    for(var i=0;i<blobs.length;i++){
+      var o=blobs[i];
+      var px=((o.x+t*.012*o.sp)%1.2-.1)*w + Math.sin(t*o.sp+o.ph)*w*.04;
+      var py=((o.y+t*.006*o.sp)%1.2-.1)*h + Math.cos(t*o.sp*.8+o.ph)*h*.03;
+      ctx.save();
+      ctx.translate(px,py); ctx.rotate(o.rot+Math.sin(t*.4*o.sp+o.ph)*.08);
+      var g=ctx.createRadialGradient(0,0,0,0,0,o.len*m);
+      g.addColorStop(0,"rgba("+rgb+","+(dark?o.a*.45:o.a)+")");
+      g.addColorStop(1,"rgba("+rgb+",0)");
+      ctx.scale(1,o.wid/o.len*1.9);
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,o.len*m,0,6.2832); ctx.fill();
+      ctx.restore();
     }
   }
-  draw();
+  function draw(ts){
+    requestAnimationFrame(draw);
+    if(document.hidden || document.body.classList.contains("hc")) return;
+    if(ts-last<33) return;
+    var dt=(ts-last)/1000; last=ts;
+    var still=document.body.classList.contains("calm")||matchMedia("(prefers-reduced-motion:reduce)").matches;
+    if(!still) t += Math.min(dt,.1)*.5;
+    paint();
+  }
+  requestAnimationFrame(draw);
 })();
 
 /* ===== تهيئة Supabase والتحكم في بوابة الدخول الأولى ===== */
