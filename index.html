@@ -598,7 +598,56 @@ body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
     }
   }
 }
+/* ===== v3: إحصاءات، تتبّع الطلب، نموذج المدخل الميسّر، وإصلاحات الموبايل ===== */
+html, body { max-width: 100%; overflow-x: clip; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0 auto; max-width: 62rem; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 1.4rem; padding: 1.2rem 1rem; text-align: center; }
+.stat b { display: block; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; color: var(--brand); font-variant-numeric: tabular-nums; }
+.stat span { font-size: .92rem; color: var(--soft); font-weight: 700; }
+.trk { margin-top: 1.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 1.6rem; padding: 1.3rem; }
+.trk h3 { margin: 0 0 .2rem; font-size: 1.2rem; }
+.trk .trk-ref { font-size: .88rem; color: var(--soft); margin: 0 0 1rem; }
+.pbar { height: .7rem; border-radius: 9rem; background: var(--surface); overflow: hidden; border: 1px solid var(--line); }
+.pbar i { display: block; height: 100%; width: 0; background: var(--accent, #CBE857); border-radius: 9rem; transition: width .8s var(--ease, ease); }
+.trk ol { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .6rem; }
+.trk li { display: grid; grid-template-columns: 1.7rem 1fr auto; gap: .65rem; align-items: center; opacity: .55; font-weight: 700; font-size: .95rem; }
+.trk li i { width: 1.5rem; height: 1.5rem; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-style: normal; font-size: .8rem; }
+.trk li.done { opacity: 1; } .trk li.done i { background: var(--brand); border-color: var(--brand); color: var(--bg, #fff); }
+.trk li.cur { opacity: 1; } .trk li.cur i { background: var(--accent, #CBE857); border-color: var(--brand); color: #18231C; }
+.trk li small { font-weight: 500; color: var(--soft); font-size: .78rem; }
+.trk-model { margin-top: 1.1rem; border-radius: 1.3rem; background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.trk-model canvas { display: block; width: 100%; height: 15rem; touch-action: pan-y; cursor: grab; }
+.trk-model canvas:active { cursor: grabbing; }
+.trk-model canvas:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+.trk-cap { padding: .6rem .9rem; font-size: .82rem; color: var(--soft); border-top: 1px solid var(--line); }
+.trk-ntf { margin-top: 1rem; display: grid; gap: .45rem; font-size: .88rem; }
+.trk-ntf div { padding: .55rem .8rem; border-radius: .9rem; background: var(--accent-soft); border: 1px solid var(--line); }
+#ntf { position: fixed; top: 5.2rem; inset-inline: 1rem; margin-inline: auto; width: fit-content; max-width: 92vw; z-index: 130; background: var(--deep); color: #fff; padding: .75rem 1.2rem; border-radius: 1rem; font-weight: 700; box-shadow: 0 12px 30px rgba(0,0,0,.25); opacity: 0; transform: translateY(-12px); pointer-events: none; transition: opacity .3s, transform .3s; }
+#ntf.on { opacity: 1; transform: none; }
+#ntf b { color: var(--accent, #CBE857); }
+.hchip { display: inline-block; margin-top: .55rem; padding: .25rem .75rem; border-radius: 9rem; font-size: .8rem; font-weight: 800; background: var(--accent-soft); color: var(--brand); border: 1px solid var(--brand); }
+.hbar { margin-top: .6rem; height: .5rem; border-radius: 9rem; background: var(--surface); overflow: hidden; border: 1px solid var(--line); }
+.hbar i { display: block; height: 100%; background: var(--accent, #CBE857); }
+body.calm .pbar i, body.calm #ntf { transition: none; }
+.hero-card, .hero-card > * { min-width: 0; }
+.hero-card { max-width: 100%; }
+@media (max-width: 920px) { .hero-card { grid-template-columns: minmax(0, 1fr); } .hero-editorial { max-width: 100%; } .hero-media { max-width: 100%; } .sector-strip { flex-wrap: wrap; } }
+@media (max-width: 700px) {
+  .deck { min-height: 0; display: block; margin: 1rem 0; }
+  .dc { display: none; position: relative; transform: none !important; opacity: 1 !important; width: 100%; }
+  .dc[aria-hidden="false"] { display: block; }
+  #sc > div:last-child { flex: 1; min-width: 0; }
+  #sc a { white-space: nowrap; }
+  .stats { gap: .5rem; } .stat { padding: .9rem .4rem; } .stat span { font-size: .78rem; }
+  .fab { bottom: calc(.7rem + env(safe-area-inset-bottom, 0px)); inset-inline-end: .6rem; }
+  .orb { width: 2.85rem; height: 2.85rem; border-radius: .9rem; }
+  .dock { gap: .35rem; padding: .3rem; border-radius: 1.1rem; }
+  .chat { inset-inline: .6rem; width: auto; bottom: calc(.7rem + env(safe-area-inset-bottom, 0px)); max-height: 80dvh; }
+  footer { padding-bottom: 5.5rem; }
+  .trk-model canvas { height: 13rem; }
+}
 </style>
+
 </head><body class="locked">
 
 <!-- ==================== خلفية الموقع المتحركة الهادئة (Berry Ambient Wave) ==================== -->
@@ -723,6 +772,7 @@ body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
  </section>
 
  <!-- لمسة Berry: مختبر القراءة والمظهر التفاعلي الحي -->
+ <section class="blk" aria-label="أرقام المنصة"><div class="in2"><div class="stats"><div class="stat"><b data-count="4" data-src="SV">4</b><span>قطاعات خدمة</span></div><div class="stat"><b data-count="6" data-src="DIR">6</b><span>جهات ميسّرة في الدليل</span></div><div class="stat"><b data-count="5" data-src="GR">5</b><span>مجموعات مجتمع</span></div></div></div></section>
  <section class="blk"><div class="in2">
   <div class="berry-lab">
    <div>
@@ -771,7 +821,7 @@ body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
  </div></section>
 
  <section class="blk trust"><div class="in2">
-  <div class="badge"><div class="pct"><div><b>3</b><br><span>خطوات فقط لتجهيز استقبالك</span></div></div>
+  <div class="badge"><div class="pct"><div><b data-count="3">3</b><br><span>خطوات فقط لتجهيز استقبالك</span></div></div>
   <div class="bc"><strong>#01</strong><div><h3 style="font-size:1.15rem">مجتمع يدعمك</h3><p>من الإعاقة الحركية إلى الحالات الصحية الحرجة، تجد هنا من يشاركك التجربة والنصيحة.</p></div></div></div>
   <h2 class="ghostw" id="gw" aria-live="polite"></h2>
   <div class="deck" id="deck" role="group" aria-label="مجموعات المجتمع"></div>
@@ -891,6 +941,14 @@ body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
     <button class="btn br mag" type="submit" style="width:100%">تأكيد وإرسال طلب التجهيز</button>
    </form>
    <div id="done" class="ok" role="status" hidden></div>
+   <div class="trk" id="trk" aria-labelledby="trkT">
+    <h3 id="trkT">تتبّع طلبك</h3>
+    <p class="trk-ref" id="trkRef">أرسل طلبًا لتشاهد مراحله هنا. هذه محاكاة داخل الصفحة للعرض.</p>
+    <div class="pbar" role="progressbar" aria-label="تقدّم الطلب" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="trkBar"><i></i></div>
+    <ol id="trkSteps"></ol>
+    <div class="trk-model"><canvas id="entr3d" tabindex="0" role="img" aria-label="نموذج ثلاثي الأبعاد لمدخل مجهّز: مبنى بمطلع وباب عريض ودرابزين وأسانسير. اسحب لتدويره. تضيء الأجزاء مع تقدّم الطلب."></canvas><div class="trk-cap" id="trkCap">اسحب النموذج لتدويره. كل مرحلة تضيء جزءًا من المدخل.</div></div>
+    <div class="trk-ntf" id="trkNtf" aria-live="polite"></div>
+   </div>
   </div>
   <div class="visual-aside">
    <div class="va-img"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80" alt="تجهيز الاستقبال الطبي"></div>
@@ -990,6 +1048,7 @@ body.hc .blk.trust { background: #000; border-block: 2px solid #fff; }
  <p class="cnote">المساعد الذكي يرسل رسائلك لخدمة Groq. تجنب كتابة بيانات حساسة حقيقية.</p>
  <form id="cf" autocomplete="off"><input class="fi" id="ci" aria-label="اكتب سؤالك" placeholder="اسأل عن الخدمات أو اطلب صفحة…"><button class="orb mic" type="button" id="cmic" aria-label="تحدث بدل الكتابة"><svg class="svg-ic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></button><button class="btn br" type="submit">إرسال</button></form>
 </section>
+<div id="ntf" role="status" aria-live="polite"></div>
 <div id="vtoast" role="status" aria-live="polite"></div>
 
 </div><!-- نهاية #appShell -->
@@ -1746,5 +1805,102 @@ function route0(){
 }
 window.addEventListener("hashchange",route0);route0();
 </script>
+<script>
+/* ===== v3: عدّادات، تتبّع الطلب (محاكاة داخل الصفحة)، ونموذج المدخل الميسّر. واجهة فقط، بدون أي تعديل على Supabase أو الـ API ===== */
+(function(){try{
+var calm=function(){return document.body.classList.contains("calm")||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)};
+/* عدّادات */
+var srcs={SV:typeof SV!=="undefined"?SV:null,DIR:typeof DIR!=="undefined"?DIR:null,GR:typeof GR!=="undefined"?GR:null};
+$$("[data-count]").forEach(function(el){var s=el.dataset.src;if(s&&srcs[s]&&srcs[s].length)el.dataset.count=srcs[s].length;el.textContent=el.dataset.count});
+function countUp(el){var to=+el.dataset.count;if(calm()){el.textContent=to;return}var t0=performance.now(),d=1300;
+ (function f(t){var p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e);if(p<1)requestAnimationFrame(f)})(t0)}
+if("IntersectionObserver" in window){var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){io.unobserve(x.target);countUp(x.target)}})},{threshold:.4});
+ $$("[data-count]").forEach(function(el){if(!calm())el.textContent="0";io.observe(el)})}
+/* مراحل الطلب */
+var ST=[
+ {n:"تسجيل الطلب",at:0,msg:"تم تسجيل طلبك"},
+ {n:"استلمت الجهة الطلب",at:6000,msg:"استلمت الجهة طلبك"},
+ {n:"قيد المراجعة والتنسيق",at:14000,msg:"طلبك قيد المراجعة والتنسيق مع فريق الاستقبال"},
+ {n:"تم التجهيز",at:24000,msg:"تم تجهيز المكان. بانتظارك"}];
+var KEY="tamkeen_sim";
+function load(){return ld(KEY)||[]}
+function stepOf(r){var e=Date.now()-r.t0,k=0;for(var i=0;i<ST.length;i++)if(e>=ST[i].at)k=i;return k}
+function hm(ms){return new Date(ms).toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}
+var ntfT;function toast(t){var n=$("#ntf");n.innerHTML="<b>إشعار:</b> "+esc(t);n.classList.add("on");clearTimeout(ntfT);ntfT=setTimeout(function(){n.classList.remove("on")},4200)}
+/* نموذج ثلاثي الأبعاد: أشكال هندسية مسطحة */
+var cv=$("#entr3d"),cx=cv&&cv.getContext("2d"),yaw=-.6,pitch=.5,drag=null,curStep=-1,W=0,H=0;
+function box(x0,x1,y0,y1,z0,z1){return [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]]}
+function bar(x0,x1,zA,yA,zB,yB){var t=.06;function sl(z,y){return [[x0,y-t,z],[x1,y-t,z],[x1,y+t,z],[x0,y+t,z]]}return sl(zA,yA).concat(sl(zB,yB))}
+var FACES=[[0,3,2,1],[4,5,6,7],[0,4,7,3],[1,2,6,5],[3,7,6,2],[0,1,5,4]];
+/* z للأمام. الأجزاء: kind = body | door | ramp | rail | lift | base ; step = المرحلة التي تضيئه */
+var P=[
+ {k:"base",s:-1,v:box(-4.4,5.6,0,.2,-3.2,6)},
+ {k:"body",s:0,v:box(-3,3,.2,3.4,-2.6,1)},
+ {k:"body",s:0,v:box(-3.2,3.2,3.4,3.65,-2.8,1.35)},
+ {k:"door",s:1,v:box(-.95,.95,.65,2.7,1,1.08)},
+ {k:"door",s:1,v:box(-1.7,1.7,.2,.65,1,2.3)},
+ {k:"ramp",s:2,v:[[-1.5,.2,2.3],[1.5,.2,2.3],[1.5,.65,2.3],[-1.5,.65,2.3],[-1.5,.2,5.4],[1.5,.2,5.4],[1.5,.2,5.4],[-1.5,.2,5.4]]},
+ {k:"rail",s:2,v:box(-1.64,-1.52,.65,1.3,2.3,2.4)},{k:"rail",s:2,v:box(1.52,1.64,.65,1.3,2.3,2.4)},
+ {k:"rail",s:2,v:box(-1.64,-1.52,.2,.85,5.2,5.3)},{k:"rail",s:2,v:box(1.52,1.64,.2,.85,5.2,5.3)},
+ {k:"rail",s:2,v:bar(-1.64,-1.52,2.35,1.3,5.25,.85)},{k:"rail",s:2,v:bar(1.52,1.64,2.35,1.3,5.25,.85)},
+ {k:"lift",s:3,v:box(3.2,4.6,.2,4.3,-2.6,-.6)},
+ {k:"lift",s:3,v:box(3.2,4.6,.5,2.3,-.6,-.52)}];
+var COL={body:[[222,232,214],[110,150,110]],door:[[222,232,214],[203,232,87]],ramp:[[222,232,214],[203,232,87]],rail:[[222,232,214],[31,73,48]],lift:[[222,232,214],[203,232,87]],base:[[200,208,196],[200,208,196]]};
+function dark(){var c=document.body.classList;return c.contains("dark")}
+function rgb(c,f){return "rgb("+c.map(function(v){return Math.round(Math.min(255,v*f))}).join(",")+")"}
+function size(){if(!cv)return;var r=cv.getBoundingClientRect(),d=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)}
+function draw(){if(!cv||!W)return;cx.clearRect(0,0,W,H);
+ var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch),sc=Math.min(W/12.5,H/7.6),dk=dark();
+ function rot(x,y,z){var x1=x*cy+z*sy,z1=-x*sy+z*cy;return [x1,y*cp-z1*sp,y*sp+z1*cp]}
+ function pr(p){var r=rot(p[0]-.6,p[1]-1.8,p[2]-1.4);return [W/2+r[0]*sc,H*.58-r[1]*sc,r[2]]}
+ var fs=[];
+ P.forEach(function(pt){var q=pt.v.map(pr),lit=pt.s<=curStep&&pt.s>=0,cur=pt.s===curStep;
+  var cen=[0,0,0];pt.v.forEach(function(v){cen[0]+=v[0]/8;cen[1]+=v[1]/8;cen[2]+=v[2]/8});
+  FACES.forEach(function(f){var fc=[0,0,0];f.forEach(function(i){fc[0]+=pt.v[i][0]/4;fc[1]+=pt.v[i][1]/4;fc[2]+=pt.v[i][2]/4});
+   var n=[fc[0]-cen[0],fc[1]-cen[1],fc[2]-cen[2]],l=Math.hypot(n[0],n[1],n[2])||1;n=[n[0]/l,n[1]/l,n[2]/l];
+   var r=rot(n[0],n[1],n[2]);if(r[2]<=0.02&&pt.k!=="base")return;if(pt.k==="base"&&r[2]<=0.02)return;
+   var d=(q[f[0]][2]+q[f[1]][2]+q[f[2]][2]+q[f[3]][2])/4;
+   var Lt=.6+.4*Math.max(0,r[1]*.75+r[0]*.35+r[2]*.3);
+   var base=COL[pt.k][lit?1:0];if(pt.k==="body"&&lit)base=[120,160,118];
+   if(dk&&!lit)base=base.map(function(v){return v*.3});
+   fs.push({q:f.map(function(i){return q[i]}),d:d,c:rgb(base,Lt),cur:cur&&pt.k!=="body"})})});
+ fs.sort(function(a,b){return a.d-b.d});
+ fs.forEach(function(f){cx.beginPath();f.q.forEach(function(p,i){i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1])});cx.closePath();cx.fillStyle=f.c;cx.fill();cx.lineJoin="round";cx.lineWidth=f.cur?2.2:1;cx.strokeStyle=f.cur?(dk?"#fff":"#1F4930"):(dk?"rgba(255,255,255,.18)":"rgba(31,73,48,.3)");cx.stroke()})}
+function nrm(a,b,c){var u=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],v=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];var n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];var l=Math.hypot(n[0],n[1],n[2])||1;return [-n[0]/l,-n[1]/l,-n[2]/l]}
+if(cv){size();window.addEventListener("resize",function(){size();draw()});
+ cv.addEventListener("pointerdown",function(e){drag={x:e.clientX,y:e.clientY};try{cv.setPointerCapture(e.pointerId)}catch(x){}});
+ cv.addEventListener("pointermove",function(e){if(!drag)return;var dx=e.clientX-drag.x;drag.x=e.clientX;yaw+=dx*.01;draw()});
+ ["pointerup","pointercancel"].forEach(function(n){cv.addEventListener(n,function(){drag=null})});
+ cv.addEventListener("keydown",function(e){if(e.key==="ArrowLeft"){yaw-=.15;draw();e.preventDefault()}if(e.key==="ArrowRight"){yaw+=.15;draw();e.preventDefault()}});
+ (function spin(){if(!drag&&!calm()&&!document.hidden&&$("#p-request").classList.contains("on")){yaw+=.004;draw()}requestAnimationFrame(spin)})();
+ if(window.ResizeObserver)new ResizeObserver(function(){size();draw()}).observe(cv)}
+/* واجهة التتبّع */
+var CAP=["المبنى جاهز لاستقبال طلبك","الباب العريض يضيء: الجهة استلمت الطلب","المطلع والدرابزين يضيئان: المراجعة والتنسيق","الأسانسير يضيء: المدخل كله جاهز"];
+function paint(){var L=load(),r=L[0];
+ if(!r){curStep=-1;$("#trkBar").setAttribute("aria-valuenow",0);$("#trkBar i").style.width="0";$("#trkSteps").innerHTML=ST.map(function(s,i){return '<li><i>'+(i+1)+'</i><span>'+s.n+'</span><small></small></li>'}).join("");$("#trkNtf").innerHTML="";draw();return}
+ var k=stepOf(r);var pct=Math.round((k+1)/ST.length*100);
+ $("#trkRef").innerHTML='رقم الطلب <span dir="ltr">'+esc(r.ref||"")+"</span> · "+esc(r.e||"");
+ var bar=$("#trkBar");bar.setAttribute("aria-valuenow",pct);bar.setAttribute("aria-valuetext",ST[k].n);$("#trkBar i").style.width=pct+"%";
+ $("#trkSteps").innerHTML=ST.map(function(s,i){var c=i<k?"done":i===k?(k===ST.length-1?"done":"cur"):"";return '<li class="'+c+'"'+(i===k?' aria-current="step"':"")+'><i>'+(c==="done"?"✓":i+1)+'</i><span>'+s.n+'</span><small>'+(i<=k?hm(r.t0+s.at):"")+'</small></li>'}).join("");
+ $("#trkNtf").innerHTML=ST.slice(0,k+1).reverse().map(function(s,j){return '<div>'+esc(s.msg)+' <small>('+hm(r.t0+s.at)+')</small></div>'}).join("");
+ if(k!==curStep){curStep=k;$("#trkCap").textContent=CAP[k]+". اسحب لتدويره."}
+ draw()}
+function tick(){var L=load(),r=L[0];if(r){var k=stepOf(r);if(k>(r.n||0)){var old=r.n||0;r.n=k;sv2(KEY,L);if(k>old&&Date.now()-r.t0<ST[ST.length-1].at+3000)toast(ST[k].msg);if(!document.hidden)paint()}else if(curStep!==k)paint()}
+ if($("#p-profile")&&$("#p-profile").classList.contains("on"))decorate()}
+document.addEventListener("submit",function(e){if(e.target.id!=="rf")return;
+ var r={e:$("#re").value,d:$("#rd").value,t0:Date.now(),n:0,ref:""};var L=load();L.unshift(r);sv2(KEY,L.slice(0,20));
+ setTimeout(function(){var s=$("#done span[dir=ltr]");if(s){var L2=load();L2[0].ref=s.textContent;sv2(KEY,L2)}paint();toast(ST[0].msg);var t=$("#trk");if(t&&t.scrollIntoView)t.scrollIntoView({behavior:calm()?"auto":"smooth",block:"start"})},60)},true);
+/* سجل الطلبات في ملفي: حالة وشريط تقدّم */
+function decorate(){var L=load(),cs=$$("#phist > .card");cs.forEach(function(c,i){var r=L[i],h=$("h3",c);if(!r||!h||h.textContent!==r.e)return;var k=stepOf(r),pct=Math.round((k+1)/ST.length*100),x=$(".hx",c);
+ if(!x){x=document.createElement("div");x.className="hx";c.appendChild(x)}
+ var html='<span class="hchip">'+ST[k].n+'</span><div class="hbar" role="progressbar" aria-label="تقدّم الطلب" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><i style="width:'+pct+'%"></i></div>';
+ if(x.dataset.h!==html){x.innerHTML=html;x.dataset.h=html}})}
+if(typeof renderProfile==="function"){var _rp=renderProfile;renderProfile=function(){_rp.apply(this,arguments);decorate()}}
+window.addEventListener("hashchange",function(){setTimeout(function(){size();paint();decorate()},120)});
+document.addEventListener("click",function(e){if(e.target.id==="pdel"){try{localStorage.removeItem(KEY)}catch(x){}paint()}});
+setInterval(tick,1000);setTimeout(function(){size();paint()},300);
+}catch(err){if(window.console)console.warn("tracker",err)}})();
+</script>
+
 </body>
 </html>
